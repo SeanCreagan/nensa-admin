@@ -72,8 +72,8 @@ class nensa_admin {
 	
 	public function wp_csv_to_db_register(){
     $wp_csv_to_db_page = add_submenu_page( 'options-general.php', __('NENSA Admin','nensa_admin'), __('NENSA Admin','nensa_admin'), 'manage_options', 'nensa_admin_menu_page', array( $this, 'nensa_admin_menu_page' )); // Add submenu page to "Settings" link in WP
-		add_action( 'admin_print_scripts-' . $wp_csv_to_db_page, array( $this, 'wp_csv_to_db_admin_scripts' ) );  // Load our admin page scripts (our page only)
-		add_action( 'admin_print_styles-' . $wp_csv_to_db_page, array( $this, 'wp_csv_to_db_admin_styles' ) );  // Load our admin page stylesheet (our page only)
+		add_action( 'admin_print_scripts-' . $wp_csv_to_db_page, array( $this, 'nensa_admin_admin_scripts' ) );  // Load our admin page scripts (our page only)
+		add_action( 'admin_print_styles-' . $wp_csv_to_db_page, array( $this, 'nensa_admin_admin_styles' ) );  // Load our admin page stylesheet (our page only)
 	}
 	
 	public function wp_csv_to_db_settings() {
@@ -101,7 +101,7 @@ class nensa_admin {
     	return $valid;
 	}
 	
-	public function wp_csv_to_db_admin_scripts() {
+	public function nensa_admin_admin_scripts() {
 		wp_enqueue_script('media-upload');  // For WP media uploader
 		wp_enqueue_script('thickbox');  // For WP media uploader
 		wp_enqueue_script('jquery-ui-tabs');  // For admin panel page tabs
@@ -111,7 +111,7 @@ class nensa_admin {
 		wp_localize_script( 'nensa_admin', 'wp_csv_to_db_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
 	}
 	
-	public function wp_csv_to_db_admin_styles() {
+	public function nensa_admin_admin_styles() {
 		wp_enqueue_style('thickbox');  // For WP media uploader
 		wp_enqueue_style('sdm_admin_styles', plugins_url( '/css/admin_page.css', __FILE__ ));  // Apply admin page styles
 		

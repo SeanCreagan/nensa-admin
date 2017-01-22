@@ -34,7 +34,7 @@ function jn_select_callback() {
 	wp_die();
 }
 
-class wp_csv_to_db {
+class nensa_admin {
 
 	// Setup options variables
 	protected $option_name = 'wp_csv_to_db';  // Name of the options array
@@ -580,7 +580,7 @@ class wp_csv_to_db {
 	}
 	
 }
-$wp_csv_to_db = new wp_csv_to_db();
+$wp_csv_to_db = new nensa_admin();
 
 //  Ajax call for showing table column names
 add_action( 'wp_ajax_wp_csv_to_db_get_columns', 'wp_csv_to_db_get_columns_callback' );

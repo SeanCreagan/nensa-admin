@@ -14,7 +14,7 @@ include ("connection.php");
 
 add_action( 'admin_enqueue_scripts', 'my_enqueue' );
 function my_enqueue($hook) {
-	if (!strpos($hook, 'csv') !== false) {
+	if (!strpos($hook, 'nensa_admin') !== false) {
 	  	return;
 	} 
         
@@ -37,7 +37,7 @@ function jn_select_callback() {
 class nensa_admin {
 
 	// Setup options variables
-	protected $option_name = 'wp_csv_to_db';  // Name of the options array
+	protected $option_name = 'nensa_admin';  // Name of the options array
 	protected $data = array(  // Default options values
 		'jq_theme' => 'smoothness'
 	);
@@ -71,7 +71,7 @@ class nensa_admin {
 	}
 	
 	public function wp_csv_to_db_register(){
-    $wp_csv_to_db_page = add_submenu_page( 'options-general.php', __('NENSA Admin','wp_csv_to_db'), __('NENSA Admin','wp_csv_to_db'), 'manage_options', 'nensa_admin_menu_page', array( $this, 'nensa_admin_menu_page' )); // Add submenu page to "Settings" link in WP
+    $wp_csv_to_db_page = add_submenu_page( 'options-general.php', __('NENSA Admin','nensa_admin'), __('NENSA Admin','nensa_admin'), 'manage_options', 'nensa_admin_menu_page', array( $this, 'nensa_admin_menu_page' )); // Add submenu page to "Settings" link in WP
 		add_action( 'admin_print_scripts-' . $wp_csv_to_db_page, array( $this, 'wp_csv_to_db_admin_scripts' ) );  // Load our admin page scripts (our page only)
 		add_action( 'admin_print_styles-' . $wp_csv_to_db_page, array( $this, 'wp_csv_to_db_admin_styles' ) );  // Load our admin page stylesheet (our page only)
 	}
@@ -107,8 +107,8 @@ class nensa_admin {
 		wp_enqueue_script('jquery-ui-tabs');  // For admin panel page tabs
 		wp_enqueue_script('jquery-ui-dialog');  // For admin panel popup alerts
 		
-		wp_enqueue_script( 'wp_csv_to_db', plugins_url( '/js/admin_page.js', __FILE__ ), array('jquery') );  // Apply admin page scripts
-		wp_localize_script( 'wp_csv_to_db', 'wp_csv_to_db_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
+		wp_enqueue_script( 'nensa_admin', plugins_url( '/js/admin_page.js', __FILE__ ), array('jquery') );  // Apply admin page scripts
+		wp_localize_script( 'nensa_admin', 'wp_csv_to_db_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
 	}
 	
 	public function wp_csv_to_db_admin_styles() {
@@ -199,15 +199,15 @@ class nensa_admin {
 			$del_qry_success = $wpdb1->query($del_qry);
 			
 			if($del_qry_success) {
-				$success_message .= __('Congratulations!  The database table has been deleted successfully.','wp_csv_to_db');
+				$success_message .= __('Congratulations!  The database table has been deleted successfully.','nensa_admin');
 			}
 			else {
-				$error_message .= '* '.__('Error deleting table. Please verify the table exists.','wp_csv_to_db');
+				$error_message .= '* '.__('Error deleting table. Please verify the table exists.','nensa_admin');
 			}
 		}
 		
 		if ((isset($_POST['export_to_csv_button'])) && (empty($_POST['table_select']))) {
-			$error_message .= '* '.__('No Database Table was selected to export. Please select a Database Table for exportation.','wp_csv_to_db').'<br />';
+			$error_message .= '* '.__('No Database Table was selected to export. Please select a Database Table for exportation.','nensa_admin').'<br />';
 		}
 		
 		// If button is pressed to "Import to DB"
@@ -215,16 +215,16 @@ class nensa_admin {
 			
 			// If the "Select Table" input field is empty
 			if(empty($_POST['table_select'])) {
-				$error_message .= '* '.__('No Database Table was selected. Please select a Database Table.','wp_csv_to_db').'<br />';
+				$error_message .= '* '.__('No Database Table was selected. Please select a Database Table.','nensa_admin').'<br />';
 			}
 			// If the "Select Input File" input field is empty
 			if(empty($_POST['csv_file'])) {
-				$error_message .= '* '.__('No Input File was selected. Please enter an Input File.','wp_csv_to_db').'<br />';
+				$error_message .= '* '.__('No Input File was selected. Please enter an Input File.','nensa_admin').'<br />';
 			}
 			// Check that "Input File" has proper .csv file extension
 			$ext = pathinfo($_POST['csv_file'], PATHINFO_EXTENSION);
 			if($ext !== 'csv') {
-				$error_message .= '* '.__('The Input File does not contain the .csv file extension. Please choose a valid .csv file.','wp_csv_to_db');
+				$error_message .= '* '.__('The Input File does not contain the .csv file extension. Please choose a valid .csv file.','nensa_admin');
 			}
 			
 			// If all fields are input; and file is correct .csv format; continue
@@ -263,7 +263,7 @@ class nensa_admin {
 						
 						// If user input number exceeds available .csv rows
 						if($num_var > count($values)) {
-							$error_message .= '* '.__('Starting Row value exceeds the number of entries being updated to the database from the .csv file.','wp_csv_to_db').'<br />';
+							$error_message .= '* '.__('Starting Row value exceeds the number of entries being updated to the database from the .csv file.','nensa_admin').'<br />';
 							$too_many = 'true';  // set alert variable
 						}
 						// Else splice array and remove number (rows) user selected
@@ -274,9 +274,9 @@ class nensa_admin {
 					
 					// If there are no rows in the .csv file AND the user DID NOT input more rows than available from the .csv file
 					if( empty( $values ) && ($too_many !== 'true')) {
-						$error_message .= '* '.__('Columns do not match.','wp_csv_to_db').'<br />';
-						$error_message .= '* '.__('The number of columns in the database for this table does not match the number of columns attempting to be imported from the .csv file.','wp_csv_to_db').'<br />';
-						$error_message .= '* '.__('Please verify the number of columns attempting to be imported in the "Select Input File" exactly matches the number of columns displayed in the "Table Preview".','wp_csv_to_db').'<br />';
+						$error_message .= '* '.__('Columns do not match.','nensa_admin').'<br />';
+						$error_message .= '* '.__('The number of columns in the database for this table does not match the number of columns attempting to be imported from the .csv file.','nensa_admin').'<br />';
+						$error_message .= '* '.__('Please verify the number of columns attempting to be imported in the "Select Input File" exactly matches the number of columns displayed in the "Table Preview".','nensa_admin').'<br />';
 					}
 					else {
 						// If the user DID NOT input more rows than are available from the .csv file
@@ -313,27 +313,27 @@ class nensa_admin {
 							
 							// If db db_query_update is successful
 							if ($db_query_update) {
-								$success_message = __('Congratulations!  The database has been updated successfully.','wp_csv_to_db');
+								$success_message = __('Congratulations!  The database has been updated successfully.','nensa_admin');
 							}
 							// If db db_query_insert is successful
 							elseif ($db_query_insert) {
-								$success_message = __('Congratulations!  The database has been updated successfully.','wp_csv_to_db');
-								$success_message .= '<br /><strong>'.count($values).'</strong> '.__('record(s) were inserted into the', 'wp_csv_to_db').' <strong>'.$_POST['table_select'].'</strong> '.__('database table.','wp_csv_to_db');
+								$success_message = __('Congratulations!  The database has been updated successfully.','nensa_admin');
+								$success_message .= '<br /><strong>'.count($values).'</strong> '.__('record(s) were inserted into the', 'nensa_admin').' <strong>'.$_POST['table_select'].'</strong> '.__('database table.','nensa_admin');
 							}
 							// If db db_query_insert is successful AND there were no rows to udpate
 							elseif( ($db_query_update === 0) && ($db_query_insert === '') ) {
-								$message_info_style .= '* '.__('There were no rows to update. All .csv values already exist in the database.','wp_csv_to_db').'<br />';
+								$message_info_style .= '* '.__('There were no rows to update. All .csv values already exist in the database.','nensa_admin').'<br />';
 							}
 							else {
-								$error_message .= '* '.__('There was a problem with the database query.','wp_csv_to_db').'<br />';
-								$error_message .= '* '.__('A duplicate entry was found in the database for a .csv file entry.','wp_csv_to_db').'<br />';
-								$error_message .= '* '.__('If necessary; please use the option below to "Update Database Rows".','wp_csv_to_db').'<br />';
+								$error_message .= '* '.__('There was a problem with the database query.','nensa_admin').'<br />';
+								$error_message .= '* '.__('A duplicate entry was found in the database for a .csv file entry.','nensa_admin').'<br />';
+								$error_message .= '* '.__('If necessary; please use the option below to "Update Database Rows".','nensa_admin').'<br />';
 							}
 						}
 					}
 				}
 				else {
-					$error_message .= '* '.__('No valid .csv file was found at the specified url. Please check the "Select Input File" field and ensure it points to a valid .csv file.','wp_csv_to_db').'<br />';
+					$error_message .= '* '.__('No valid .csv file was found at the specified url. Please check the "Select Input File" field and ensure it points to a valid .csv file.','nensa_admin').'<br />';
 				}
 			}
 		}
@@ -342,7 +342,7 @@ class nensa_admin {
 		if(!empty($message_info_style)) {
 			echo '<div class="info_message_dismiss">';
 			echo $message_info_style;
-			echo '<br /><em>('.__('click to dismiss','wp_csv_to_db').')</em>';
+			echo '<br /><em>('.__('click to dismiss','nensa_admin').')</em>';
 			echo '</div>';
 		}
 		
@@ -350,7 +350,7 @@ class nensa_admin {
 		if(!empty($error_message)) {
 			echo '<div class="error_message">';
 			echo $error_message;
-			echo '<br /><em>('.__('click to dismiss','wp_csv_to_db').')</em>';
+			echo '<br /><em>('.__('click to dismiss','nensa_admin').')</em>';
 			echo '</div>';
 		}
 		
@@ -358,24 +358,24 @@ class nensa_admin {
 		if(!empty($success_message)) {
 			echo '<div class="success_message">';
 			echo $success_message;
-			echo '<br /><em>('.__('click to dismiss','wp_csv_to_db').')</em>';
+			echo '<br /><em>('.__('click to dismiss','nensa_admin').')</em>';
 			echo '</div>';
 		}
 		?>
 		<div class="wrap">
         
-            <h2><?php _e('NENSA CSV to Results Database Options','wp_csv_to_db'); ?></h2>
+            <h2><?php _e('NENSA CSV to Results Database Options','nensa_admin'); ?></h2>
             
             <p>This plugin allows you to insert CSV file data into the NENSA Results database table. You can also export the content of a database using this plugin.</p>
 			<p><a href="http://www.tipsandtricks-hq.com/wp-csv-to-database-plugin-import-excel-file-content-into-wordpress-database-2116" target="_blank">Visit the plugin page</a> for more details and usage instruction.</p>
             
             <div id="tabs">
                 <ul>
-    				<li><a href="#tabs-1"><?php _e('Settings','wp_csv_to_db'); ?></a></li>
-    				<li><a href="#tabs-2"><?php _e('Guide','wp_csv_to_db'); ?></a></li>
-    				<li><a href="#tabs-3"><?php _e('Preview','wp_csv_to_db'); ?></a></li>
-    				<li><a href="#tabs-4"><?php _e('Options','wp_csv_to_db'); ?></a></li>
-    				<li><a href="#tabs-5"><?php _e('Results Import','wp_csv_to_db'); ?></a></li>
+    				<li><a href="#tabs-1"><?php _e('Settings','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-2"><?php _e('Guide','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-3"><?php _e('Preview','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-4"><?php _e('Options','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-5"><?php _e('Results Import','nensa_admin'); ?></a></li>
                 </ul>
                 
                 <div id="tabs-1">
@@ -383,7 +383,7 @@ class nensa_admin {
         			<form id="wp_csv_to_db_form" method="post" action="">
                     <table class="form-table"> 
                         
-                        <tr valign="top"><th scope="row"><?php _e('Select Database Table:','wp_csv_to_db'); ?></th>
+                        <tr valign="top"><th scope="row"><?php _e('Select Database Table:','nensa_admin'); ?></th>
                             <td>
                                 <select id="table_select" name="table_select" value="">
                                 <option name="" value=""></option>
@@ -403,7 +403,7 @@ class nensa_admin {
                             </select>
                             </td> 
                         </tr>
-                        <tr valign="top"><th scope="row"><?php _e('Select Event:','wp_csv_to_db'); ?></th>
+                        <tr valign="top"><th scope="row"><?php _e('Select Event:','nensa_admin'); ?></th>
                             <td>
                                 <select id="event_select" name="event_select" value="">
                                 <option name="" value=""></option>
@@ -423,7 +423,7 @@ class nensa_admin {
                             </select>
                             </td> 
                         </tr>
-                        <tr valign="top"><th scope="row"><?php _e('Select Input File:','wp_csv_to_db'); ?></th>
+                        <tr valign="top"><th scope="row"><?php _e('Select Input File:','nensa_admin'); ?></th>
                             <td>
                                 <?php $repop_file = isset($_POST['csv_file']) ? $_POST['csv_file'] : null; ?>
                                 <?php $repop_csv_cols = isset($_POST['num_cols_csv_file']) ? $_POST['num_cols_csv_file'] : '0'; ?>
@@ -431,102 +431,102 @@ class nensa_admin {
                                 <input id="csv_file_button" type="button" value="Upload" />
                                 <input id="num_cols" name="num_cols" type="hidden" value="" />
                                 <input id="num_cols_csv_file" name="num_cols_csv_file" type="hidden" value="" />
-                                <br><?php _e('File must end with a .csv extension.','wp_csv_to_db'); ?>
-                                <br><?php _e('Number of .csv file Columns:','wp_csv_to_db'); echo ' '; ?><span id="return_csv_col_count"><?php echo $repop_csv_cols; ?></span>
+                                <br><?php _e('File must end with a .csv extension.','nensa_admin'); ?>
+                                <br><?php _e('Number of .csv file Columns:','nensa_admin'); echo ' '; ?><span id="return_csv_col_count"><?php echo $repop_csv_cols; ?></span>
                             </td>
                         </tr>
-                        <tr valign="top"><th scope="row"><?php _e('Select Starting Row:','wp_csv_to_db'); ?></th>
+                        <tr valign="top"><th scope="row"><?php _e('Select Starting Row:','nensa_admin'); ?></th>
                             <td>
                             	<?php $repop_row = isset($_POST['sel_start_row']) ? $_POST['sel_start_row'] : null; ?>
                                 <input id="sel_start_row" name="sel_start_row" type="text" size="10" value="<?php echo $repop_row; ?>" />
-                                <br><?php _e('Defaults to row 1 (top row) of .csv file.','wp_csv_to_db'); ?>
+                                <br><?php _e('Defaults to row 1 (top row) of .csv file.','nensa_admin'); ?>
                             </td>
                         </tr>
-                        <tr valign="top"><th scope="row"><?php _e('Disable "auto_increment" Column:','wp_csv_to_db'); ?></th>
+                        <tr valign="top"><th scope="row"><?php _e('Disable "auto_increment" Column:','nensa_admin'); ?></th>
                             <td>
                                 <input id="remove_autoinc_column" name="remove_autoinc_column" type="checkbox" />
-                                <br><?php _e('Bypasses the "auto_increment" column;','wp_csv_to_db'); ?>
-                                <br><?php _e('This will reduce (for the purposes of importation) the number of DB columns by "1".','wp_csv_to_db'); ?>
+                                <br><?php _e('Bypasses the "auto_increment" column;','nensa_admin'); ?>
+                                <br><?php _e('This will reduce (for the purposes of importation) the number of DB columns by "1".','nensa_admin'); ?>
                             </td>
                         </tr>
-                        <tr valign="top"><th scope="row"><?php _e('Update Database Rows:','wp_csv_to_db'); ?></th>
+                        <tr valign="top"><th scope="row"><?php _e('Update Database Rows:','nensa_admin'); ?></th>
                             <td>
                                 <input id="update_db" name="update_db" type="checkbox" />
-                                <br><?php _e('Will update exisiting database rows when a duplicated primary key is encountered.','wp_csv_to_db'); ?>
-                                <br><?php _e('Defaults to all rows inserted as new rows.','wp_csv_to_db'); ?>
+                                <br><?php _e('Will update exisiting database rows when a duplicated primary key is encountered.','nensa_admin'); ?>
+                                <br><?php _e('Defaults to all rows inserted as new rows.','nensa_admin'); ?>
                             </td>
                         </tr>
                     </table>
                     
                     <p class="submit">
-                        <input id="execute_button" name="execute_button" type="submit" class="button-primary" value="<?php _e('Import to DB', 'wp_csv_to_db') ?>" />
-                        <input id="export_to_csv_button" name="export_to_csv_button" type="submit" class="button-secondary" value="<?php _e('Export to CSV', 'wp_csv_to_db') ?>" />
-                        <input id="delete_db_button" name="delete_db_button" type="button" class="button-secondary" value="<?php _e('Delete Table', 'wp_csv_to_db') ?>" />
+                        <input id="execute_button" name="execute_button" type="submit" class="button-primary" value="<?php _e('Import to DB', 'nensa_admin') ?>" />
+                        <input id="export_to_csv_button" name="export_to_csv_button" type="submit" class="button-secondary" value="<?php _e('Export to CSV', 'nensa_admin') ?>" />
+                        <input id="delete_db_button" name="delete_db_button" type="button" class="button-secondary" value="<?php _e('Delete Table', 'nensa_admin') ?>" />
                         <input type="hidden" id="delete_db_button_hidden" name="delete_db_button_hidden" value="" />
                     </p>
                     </form>
                 </div> <!-- End tab 1 -->
                 <div id="tabs-2">
-                	<?php _e('Step 1 (Select Database Table):','wp_csv_to_db'); ?>
+                	<?php _e('Step 1 (Select Database Table):','nensa_admin'); ?>
                     <ul>
-                        <li><?php _e('All WP database tables will be queried and listed in the dropdown box.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('Select the table name which will be used for the query.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('Once the table is selected; the "Table Preview" will display the structure of the table.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('By structure, this means all column names will be listed in the order they appear in the database.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('This can be used to match the .csv file prior to execution; and verify it contains the same structure of columns.','wp_csv_to_db'); ?></li>
+                        <li><?php _e('All WP database tables will be queried and listed in the dropdown box.','nensa_admin'); ?></li>
+                        <li><?php _e('Select the table name which will be used for the query.','nensa_admin'); ?></li>
+                        <li><?php _e('Once the table is selected; the "Table Preview" will display the structure of the table.','nensa_admin'); ?></li>
+                        <li><?php _e('By structure, this means all column names will be listed in the order they appear in the database.','nensa_admin'); ?></li>
+                        <li><?php _e('This can be used to match the .csv file prior to execution; and verify it contains the same structure of columns.','nensa_admin'); ?></li>
                     </ul>
                     <br /><br />
-                    <?php _e('Step 2 (Select Input File):','wp_csv_to_db'); ?>
+                    <?php _e('Step 2 (Select Input File):','nensa_admin'); ?>
                     <ul>
-                        <li><?php _e('The option will be used to locate the file to be used for execution.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('A direct url to a .csv file may be entered into the text field.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('Alternatively, the "Upload" button may be used to initiate the WordPress uploader and manager.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('From here, the file can be uploaded from a computer or selected from the media library.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('The "Number of .csv file Columns" will populate when the Input File field contains a valid .csv file.','wp_csv_to_db'); ?></li>
+                        <li><?php _e('The option will be used to locate the file to be used for execution.','nensa_admin'); ?></li>
+                        <li><?php _e('A direct url to a .csv file may be entered into the text field.','nensa_admin'); ?></li>
+                        <li><?php _e('Alternatively, the "Upload" button may be used to initiate the WordPress uploader and manager.','nensa_admin'); ?></li>
+                        <li><?php _e('From here, the file can be uploaded from a computer or selected from the media library.','nensa_admin'); ?></li>
+                        <li><?php _e('The "Number of .csv file Columns" will populate when the Input File field contains a valid .csv file.','nensa_admin'); ?></li>
                     </ul>
                     <br /><br />
-                    <?php _e('Step 3 (Select Starting Row):','wp_csv_to_db'); ?>
+                    <?php _e('Step 3 (Select Starting Row):','nensa_admin'); ?>
                     <ul>
-                        <li><?php _e('The .csv file will contain rows, which get converted to database table entries.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('This option will allow customization of the starting row of the .csv file to be used during the importation.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('Row 1 is always the top row of the .csv file.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('For example: If the .csv file contains column headers (column names), it would most likely be desirable to start with row 2 of the .csv file; preventing importation of the column names row.','wp_csv_to_db'); ?></li>
+                        <li><?php _e('The .csv file will contain rows, which get converted to database table entries.','nensa_admin'); ?></li>
+                        <li><?php _e('This option will allow customization of the starting row of the .csv file to be used during the importation.','nensa_admin'); ?></li>
+                        <li><?php _e('Row 1 is always the top row of the .csv file.','nensa_admin'); ?></li>
+                        <li><?php _e('For example: If the .csv file contains column headers (column names), it would most likely be desirable to start with row 2 of the .csv file; preventing importation of the column names row.','nensa_admin'); ?></li>
                     </ul>
                     <br /><br />
-                    <?php _e('Step 4 (Disable "auto_increment" Column):','wp_csv_to_db'); ?>
+                    <?php _e('Step 4 (Disable "auto_increment" Column):','nensa_admin'); ?>
                     <ul>
-                        <li><?php _e('This option will only become available when a database table is selected which contains an auto-incremented column.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('If importing a file which already has an auto-incremented column... this setting most likely will not be needed.','wp_csv_to_db'); ?></li>
+                        <li><?php _e('This option will only become available when a database table is selected which contains an auto-incremented column.','nensa_admin'); ?></li>
+                        <li><?php _e('If importing a file which already has an auto-incremented column... this setting most likely will not be needed.','nensa_admin'); ?></li>
                     </ul>
                     <br /><br />
-                    <?php _e('Step 5 (Update Database Rows):','wp_csv_to_db'); ?>
+                    <?php _e('Step 5 (Update Database Rows):','nensa_admin'); ?>
                     <ul>
-                        <li><?php _e('By default, the plugin will add each .csv row as a new entry in the database.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('If the database uses a primary key (auto-increment) column, it will assign each new row with a new primary key value.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('This is typically how entries are added to a database.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('However; if a duplicate primary key is encountered, the import will stop at that exact point (and fail).','wp_csv_to_db'); ?></li>
-                        <li><?php _e('If this option is checked, the import process will "update" this row rather than adding a new row.','wp_csv_to_db'); ?></li>
+                        <li><?php _e('By default, the plugin will add each .csv row as a new entry in the database.','nensa_admin'); ?></li>
+                        <li><?php _e('If the database uses a primary key (auto-increment) column, it will assign each new row with a new primary key value.','nensa_admin'); ?></li>
+                        <li><?php _e('This is typically how entries are added to a database.','nensa_admin'); ?></li>
+                        <li><?php _e('However; if a duplicate primary key is encountered, the import will stop at that exact point (and fail).','nensa_admin'); ?></li>
+                        <li><?php _e('If this option is checked, the import process will "update" this row rather than adding a new row.','nensa_admin'); ?></li>
                     </ul>
                 </div> <!-- End tab 2 -->
                 <div id="tabs-3">
-                	<?php _e('The Table Preview may be useful when comparing the .csv file against the database table structure.','wp_csv_to_db'); ?>
+                	<?php _e('The Table Preview may be useful when comparing the .csv file against the database table structure.','nensa_admin'); ?>
                     <ul>
-                        <li><?php _e('The Table Preview will display all table column names, in the order they appear in the database.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('If a table column is set to "auto_increment"; this column will appear in the color "red".','wp_csv_to_db'); ?></li>
-                        <li><?php _e('This plugin assumes any "auto_increment" column will appear first in the database table. Please double-check the order of the column names to ensure they match.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('If the option is checked to "Disable auto-increment Column"; the number of database columns will be decreased by "1"; for the purposes of importing the .csv file.','wp_csv_to_db'); ?></li>
-                        <li><?php _e('Ultimately... the number of database columns MUST match the number of columns being imported from the .csv file.','wp_csv_to_db'); ?></li>
+                        <li><?php _e('The Table Preview will display all table column names, in the order they appear in the database.','nensa_admin'); ?></li>
+                        <li><?php _e('If a table column is set to "auto_increment"; this column will appear in the color "red".','nensa_admin'); ?></li>
+                        <li><?php _e('This plugin assumes any "auto_increment" column will appear first in the database table. Please double-check the order of the column names to ensure they match.','nensa_admin'); ?></li>
+                        <li><?php _e('If the option is checked to "Disable auto-increment Column"; the number of database columns will be decreased by "1"; for the purposes of importing the .csv file.','nensa_admin'); ?></li>
+                        <li><?php _e('Ultimately... the number of database columns MUST match the number of columns being imported from the .csv file.','nensa_admin'); ?></li>
                     </ul>
                 </div> <!-- End tab 3 -->
                 
                 <div id="tabs-4">
                 	<?php $options = get_option($this->option_name); ?>
-                	<?php _e('Options Settings:','wp_csv_to_db'); ?>
+                	<?php _e('Options Settings:','nensa_admin'); ?>
                     
                     <form method="post" action="options.php">
 						<?php settings_fields('wp_csv_to_db_options'); ?>
                         <table class="form-table">
-                            <tr valign="top"><th scope="row"><?php _e('jQuery Theme','wp_csv_to_db'); ?></th>
+                            <tr valign="top"><th scope="row"><?php _e('jQuery Theme','nensa_admin'); ?></th>
                                 <td>
                                 	<!-- <input type="text" name="<?php //echo $this->option_name?>[jq_theme]" value="<?php //echo $options['jq_theme']; ?>" /> -->
                                 	<select name="<?php echo $this->option_name?>[jq_theme]"/>
@@ -553,34 +553,34 @@ class nensa_admin {
             </div> <!-- End #tabs -->
         </div> <!-- End page wrap -->
         
-        <h3><?php _e('Table Preview:','wp_csv_to_db'); ?><input id="repop_table_ajax" name="repop_table_ajax" value="<?php _e('Reload Table Preview','wp_csv_to_db'); ?>" type="button" style="margin-left:20px;" /></h3>
+        <h3><?php _e('Table Preview:','nensa_admin'); ?><input id="repop_table_ajax" name="repop_table_ajax" value="<?php _e('Reload Table Preview','nensa_admin'); ?>" type="button" style="margin-left:20px;" /></h3>
             
         <div id="table_preview">
         </div>
         
-        <p><?php _e('After selecting a database table from the dropdown above; the table column names will be shown.','wp_csv_to_db'); ?>
-        <br><?php _e('This may be used as a reference when verifying the .csv file is formatted properly.','wp_csv_to_db'); ?>
-        <br><?php _e('If an "auto-increment" column exists; it will be rendered in the color "red".','wp_csv_to_db'); ?>
+        <p><?php _e('After selecting a database table from the dropdown above; the table column names will be shown.','nensa_admin'); ?>
+        <br><?php _e('This may be used as a reference when verifying the .csv file is formatted properly.','nensa_admin'); ?>
+        <br><?php _e('If an "auto-increment" column exists; it will be rendered in the color "red".','nensa_admin'); ?>
         
         <!-- Delete table warning - jquery dialog -->
-        <div id="dialog-confirm" title="<?php _e('Delete database table?','wp_csv_to_db'); ?>">
-        	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><?php _e('This table will be permanently deleted and cannot be recovered. Proceed?','wp_csv_to_db'); ?></p>
+        <div id="dialog-confirm" title="<?php _e('Delete database table?','nensa_admin'); ?>">
+        	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><?php _e('This table will be permanently deleted and cannot be recovered. Proceed?','nensa_admin'); ?></p>
         </div>
         
         <!-- Alert invalid .csv file - jquery dialog -->
-        <div id="dialog_csv_file" title="<?php _e('Invalid File Extension','wp_csv_to_db'); ?>" style="display:none;">
-        	<p><?php _e('This is not a valid .csv file extension.','wp_csv_to_db'); ?></p>
+        <div id="dialog_csv_file" title="<?php _e('Invalid File Extension','nensa_admin'); ?>" style="display:none;">
+        	<p><?php _e('This is not a valid .csv file extension.','nensa_admin'); ?></p>
         </div>
         
         <!-- Alert select db table - jquery dialog -->
-        <div id="dialog_select_db" title="<?php _e('Database Table not Selected','wp_csv_to_db'); ?>" style="display:none;">
-        	<p><?php _e('First, please select a database table from the dropdown list.','wp_csv_to_db'); ?></p>
+        <div id="dialog_select_db" title="<?php _e('Database Table not Selected','nensa_admin'); ?>" style="display:none;">
+        	<p><?php _e('First, please select a database table from the dropdown list.','nensa_admin'); ?></p>
         </div>
         <?php
 	}
 	
 }
-$wp_csv_to_db = new nensa_admin();
+$nensa_admin = new nensa_admin();
 
 //  Ajax call for showing table column names
 add_action( 'wp_ajax_wp_csv_to_db_get_columns', 'wp_csv_to_db_get_columns_callback' );
@@ -638,16 +638,16 @@ function wp_csv_to_db_get_columns_callback() {
 			}
 		}
 		$content .= '</tr></table><br />';
-		$content .= __('Number of Database Columns:','wp_csv_to_db').' <span id="column_count"><strong>'.count($column_names).'</strong></span><br />';
+		$content .= __('Number of Database Columns:','nensa_admin').' <span id="column_count"><strong>'.count($column_names).'</strong></span><br />';
 		
 		// If there is an auto_increment column in the returned results
 		if((isset($run_qry[0]->EXTRA)) && (isset($run_qry[0]->COLUMN_NAME))) {
 			// If user DID NOT click the auto_increment checkbox
 			if($disable_autoinc === 'false') {
 				$content .= '<div class="warning_message">';
-				$content .= __('This table contains an "auto increment" column.','wp_csv_to_db').'<br />';
-				$content .= __('Please be sure to use unique values in this column from the .csv file.','wp_csv_to_db').'<br />';
-				$content .= __('Alternatively, the "auto increment" column may be bypassed by clicking the checkbox above.','wp_csv_to_db').'<br />';
+				$content .= __('This table contains an "auto increment" column.','nensa_admin').'<br />';
+				$content .= __('Please be sure to use unique values in this column from the .csv file.','nensa_admin').'<br />';
+				$content .= __('Alternatively, the "auto increment" column may be bypassed by clicking the checkbox above.','nensa_admin').'<br />';
 				$content .= '</div>';
 				
 				// Send additional response
@@ -656,9 +656,9 @@ function wp_csv_to_db_get_columns_callback() {
 			// If the user clicked the auto_increment checkbox
 			if($disable_autoinc === 'true') {
 				$content .= '<div class="info_message">';
-				$content .= __('This table contains an "auto increment" column that has been removed via the checkbox above.','wp_csv_to_db').'<br />';
-				$content .= __('This means all new .csv entries will be given a unique "auto incremented" value when imported (typically, a numerical value).','wp_csv_to_db').'<br />';
-				$content .= __('The Column Name of the removed column is','wp_csv_to_db').' <strong><em>'.$run_qry[0]->COLUMN_NAME.'</em></strong>.<br />';
+				$content .= __('This table contains an "auto increment" column that has been removed via the checkbox above.','nensa_admin').'<br />';
+				$content .= __('This means all new .csv entries will be given a unique "auto incremented" value when imported (typically, a numerical value).','nensa_admin').'<br />';
+				$content .= __('The Column Name of the removed column is','nensa_admin').' <strong><em>'.$run_qry[0]->COLUMN_NAME.'</em></strong>.<br />';
 				$content .= '</div>';
 				
 				// Send additional response 
@@ -669,9 +669,9 @@ function wp_csv_to_db_get_columns_callback() {
 	else {
 		$content = '';
 		$content .= '<table id="ajax_table"><tr><td>';
-		$content .= __('No Database Table Selected.','wp_csv_to_db');
+		$content .= __('No Database Table Selected.','nensa_admin');
 		$content .= '<br />';
-		$content .= __('Please select a database table from the dropdown box above.','wp_csv_to_db');
+		$content .= __('Please select a database table from the dropdown box above.','nensa_admin');
 		$content .= '</td></tr></table>';
 	}
 	
@@ -727,7 +727,7 @@ function wp_csv_to_db_plugin_action_links( $links, $file ) {
 	if ( $file == $plugin_file ) {
 		$settings_link = '<a href="' .
 			admin_url( 'options-general.php?page=nensa_admin_menu_page' ) . '">' .
-			__( 'Settings', 'wp_csv_to_db' ) . '</a>';
+			__( 'Settings', 'nensa_admin' ) . '</a>';
 		array_unshift( $links, $settings_link );
 	}
 	return $links;
@@ -736,5 +736,5 @@ function wp_csv_to_db_plugin_action_links( $links, $file ) {
 // Load plugin language localization
 add_action('plugins_loaded', 'wp_csv_to_db_lang_init');
 function wp_csv_to_db_lang_init() {
-	load_plugin_textdomain( 'wp_csv_to_db', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+	load_plugin_textdomain( 'nensa_admin', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 }

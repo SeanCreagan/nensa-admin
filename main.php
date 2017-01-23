@@ -55,32 +55,32 @@ class nensa_admin {
 		// Check if is admin
 		// We can later update this to include other user roles
 		if (is_admin()) {
-      add_action( 'plugins_loaded', array( $this, 'wp_csv_to_db_plugins_loaded' ));//Handles tasks that need to be done at plugins loaded stage.
-			add_action( 'admin_menu', array( $this, 'wp_csv_to_db_register' ));  // Create admin menu page
-			add_action( 'admin_init', array( $this, 'wp_csv_to_db_settings' ) ); // Create settings
-			register_activation_hook( __FILE__ , array($this, 'wp_csv_to_db_activate')); // Add settings on plugin activation
+      add_action( 'plugins_loaded', array( $this, 'nensa_admin_plugins_loaded' ));//Handles tasks that need to be done at plugins loaded stage.
+			add_action( 'admin_menu', array( $this, 'nensa_admin_register' ));  // Create admin menu page
+			add_action( 'admin_init', array( $this, 'nensa_admin_settings' ) ); // Create settings
+			register_activation_hook( __FILE__ , array($this, 'nensa_admin_activate')); // Add settings on plugin activation
 		}
 	}
 	
-  public function wp_csv_to_db_plugins_loaded(){
+  public function nensa_admin_plugins_loaded(){
       $this->handle_csv_export_action();
   }
         
-	public function wp_csv_to_db_activate() {
+	public function nensa_admin_activate() {
 		update_option($this->option_name, $this->data);
 	}
 	
-	public function wp_csv_to_db_register(){
+	public function nensa_admin_register(){
     $wp_csv_to_db_page = add_submenu_page( 'options-general.php', __('NENSA Admin','nensa_admin'), __('NENSA Admin','nensa_admin'), 'manage_options', 'nensa_admin_menu_page', array( $this, 'nensa_admin_menu_page' )); // Add submenu page to "Settings" link in WP
 		add_action( 'admin_print_scripts-' . $wp_csv_to_db_page, array( $this, 'nensa_admin_admin_scripts' ) );  // Load our admin page scripts (our page only)
 		add_action( 'admin_print_styles-' . $wp_csv_to_db_page, array( $this, 'nensa_admin_admin_styles' ) );  // Load our admin page stylesheet (our page only)
 	}
 	
-	public function wp_csv_to_db_settings() {
-		register_setting('wp_csv_to_db_options', $this->option_name, array($this, 'wp_csv_to_db_validate'));
+	public function nensa_admin_settings() {
+		register_setting('wp_csv_to_db_options', $this->option_name, array($this, 'nensa_admin_validate'));
 	}
 	
-	public function wp_csv_to_db_validate($input) {
+	public function nensa_admin_validate($input) {
 		$valid = array();
 		/*
 		$valid['jq_theme'] = sanitize_text_field($input['jq_theme']);
@@ -372,13 +372,15 @@ class nensa_admin {
             <div id="tabs">
                 <ul>
     				<li><a href="#tabs-1"><?php _e('Settings','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-2"><?php _e('Guide','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-3"><?php _e('Preview','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-4"><?php _e('Options','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-5"><?php _e('Results Import','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-2"><?php _e('Events','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-3"><?php _e('NEON','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-4"><?php _e('Member Season','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-5"><?php _e('Member Skier','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-6"><?php _e('Results','nensa_admin'); ?></a></li>
+    				<li><a href="#tabs-6"><?php _e('DataTables','nensa_admin'); ?></a></li>
                 </ul>
                 
-                <div id="tabs-1">
+              <div id="tabs-1">
                 
         			<form id="wp_csv_to_db_form" method="post" action="">
                     <table class="form-table"> 
@@ -467,100 +469,27 @@ class nensa_admin {
                     </form>
                 </div> <!-- End tab 1 -->
                 <div id="tabs-2">
-                	<?php _e('Step 1 (Select Database Table):','nensa_admin'); ?>
-                    <ul>
-                        <li><?php _e('All WP database tables will be queried and listed in the dropdown box.','nensa_admin'); ?></li>
-                        <li><?php _e('Select the table name which will be used for the query.','nensa_admin'); ?></li>
-                        <li><?php _e('Once the table is selected; the "Table Preview" will display the structure of the table.','nensa_admin'); ?></li>
-                        <li><?php _e('By structure, this means all column names will be listed in the order they appear in the database.','nensa_admin'); ?></li>
-                        <li><?php _e('This can be used to match the .csv file prior to execution; and verify it contains the same structure of columns.','nensa_admin'); ?></li>
-                    </ul>
-                    <br /><br />
-                    <?php _e('Step 2 (Select Input File):','nensa_admin'); ?>
-                    <ul>
-                        <li><?php _e('The option will be used to locate the file to be used for execution.','nensa_admin'); ?></li>
-                        <li><?php _e('A direct url to a .csv file may be entered into the text field.','nensa_admin'); ?></li>
-                        <li><?php _e('Alternatively, the "Upload" button may be used to initiate the WordPress uploader and manager.','nensa_admin'); ?></li>
-                        <li><?php _e('From here, the file can be uploaded from a computer or selected from the media library.','nensa_admin'); ?></li>
-                        <li><?php _e('The "Number of .csv file Columns" will populate when the Input File field contains a valid .csv file.','nensa_admin'); ?></li>
-                    </ul>
-                    <br /><br />
-                    <?php _e('Step 3 (Select Starting Row):','nensa_admin'); ?>
-                    <ul>
-                        <li><?php _e('The .csv file will contain rows, which get converted to database table entries.','nensa_admin'); ?></li>
-                        <li><?php _e('This option will allow customization of the starting row of the .csv file to be used during the importation.','nensa_admin'); ?></li>
-                        <li><?php _e('Row 1 is always the top row of the .csv file.','nensa_admin'); ?></li>
-                        <li><?php _e('For example: If the .csv file contains column headers (column names), it would most likely be desirable to start with row 2 of the .csv file; preventing importation of the column names row.','nensa_admin'); ?></li>
-                    </ul>
-                    <br /><br />
-                    <?php _e('Step 4 (Disable "auto_increment" Column):','nensa_admin'); ?>
-                    <ul>
-                        <li><?php _e('This option will only become available when a database table is selected which contains an auto-incremented column.','nensa_admin'); ?></li>
-                        <li><?php _e('If importing a file which already has an auto-incremented column... this setting most likely will not be needed.','nensa_admin'); ?></li>
-                    </ul>
-                    <br /><br />
-                    <?php _e('Step 5 (Update Database Rows):','nensa_admin'); ?>
-                    <ul>
-                        <li><?php _e('By default, the plugin will add each .csv row as a new entry in the database.','nensa_admin'); ?></li>
-                        <li><?php _e('If the database uses a primary key (auto-increment) column, it will assign each new row with a new primary key value.','nensa_admin'); ?></li>
-                        <li><?php _e('This is typically how entries are added to a database.','nensa_admin'); ?></li>
-                        <li><?php _e('However; if a duplicate primary key is encountered, the import will stop at that exact point (and fail).','nensa_admin'); ?></li>
-                        <li><?php _e('If this option is checked, the import process will "update" this row rather than adding a new row.','nensa_admin'); ?></li>
-                    </ul>
+
                 </div> <!-- End tab 2 -->
                 <div id="tabs-3">
-                	<?php _e('The Table Preview may be useful when comparing the .csv file against the database table structure.','nensa_admin'); ?>
-                    <ul>
-                        <li><?php _e('The Table Preview will display all table column names, in the order they appear in the database.','nensa_admin'); ?></li>
-                        <li><?php _e('If a table column is set to "auto_increment"; this column will appear in the color "red".','nensa_admin'); ?></li>
-                        <li><?php _e('This plugin assumes any "auto_increment" column will appear first in the database table. Please double-check the order of the column names to ensure they match.','nensa_admin'); ?></li>
-                        <li><?php _e('If the option is checked to "Disable auto-increment Column"; the number of database columns will be decreased by "1"; for the purposes of importing the .csv file.','nensa_admin'); ?></li>
-                        <li><?php _e('Ultimately... the number of database columns MUST match the number of columns being imported from the .csv file.','nensa_admin'); ?></li>
-                    </ul>
+
                 </div> <!-- End tab 3 -->
                 
                 <div id="tabs-4">
-                	<?php $options = get_option($this->option_name); ?>
-                	<?php _e('Options Settings:','nensa_admin'); ?>
-                    
-                    <form method="post" action="options.php">
-						<?php settings_fields('wp_csv_to_db_options'); ?>
-                        <table class="form-table">
-                            <tr valign="top"><th scope="row"><?php _e('jQuery Theme','nensa_admin'); ?></th>
-                                <td>
-                                	<!-- <input type="text" name="<?php //echo $this->option_name?>[jq_theme]" value="<?php //echo $options['jq_theme']; ?>" /> -->
-                                	<select name="<?php echo $this->option_name?>[jq_theme]"/>
-                                    	<?php
-                        				$jquery_themes = array('base','black-tie','blitzer','cupertino','dark-hive','dot-luv','eggplant','excite-bike','flick','hot-sneaks','humanity','le-frog','mint-choc','overcast','pepper-grinder','redmond','smoothness','south-street','start','sunny','swanky-purse','trontastic','ui-darkness','ui-lightness','vader');
-										
-										foreach($jquery_themes as $jquery_theme) {
-											$selected = ($options['jq_theme']==$jquery_theme) ? 'selected="selected"' : '';
-											echo "<option value='$jquery_theme' $selected>$jquery_theme</option>";
-										}
-										?>
-                                	</select>
-                                </td>
-                            </tr>
-                        </table>
-                        <p class="submit">
-                            <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
-                        </p>
-                    </form>
+
                 </div> <!-- End tab 4 -->
                 <div id="tabs-5">
+									
+                </div> <!-- End tab 5 -->
+                <div id="tabs-6">
 									<?php	import_results(); ?>
+                </div> <!-- End tab 5 -->
+                <div id="tabs-6">
+									
                 </div> <!-- End tab 5 -->
             </div> <!-- End #tabs -->
         </div> <!-- End page wrap -->
         
-        <h3><?php _e('Table Preview:','nensa_admin'); ?><input id="repop_table_ajax" name="repop_table_ajax" value="<?php _e('Reload Table Preview','nensa_admin'); ?>" type="button" style="margin-left:20px;" /></h3>
-            
-        <div id="table_preview">
-        </div>
-        
-        <p><?php _e('After selecting a database table from the dropdown above; the table column names will be shown.','nensa_admin'); ?>
-        <br><?php _e('This may be used as a reference when verifying the .csv file is formatted properly.','nensa_admin'); ?>
-        <br><?php _e('If an "auto-increment" column exists; it will be rendered in the color "red".','nensa_admin'); ?>
         
         <!-- Delete table warning - jquery dialog -->
         <div id="dialog-confirm" title="<?php _e('Delete database table?','nensa_admin'); ?>">
@@ -734,7 +663,7 @@ function wp_csv_to_db_plugin_action_links( $links, $file ) {
 }
 
 // Load plugin language localization
-add_action('plugins_loaded', 'wp_csv_to_db_lang_init');
-function wp_csv_to_db_lang_init() {
+add_action('plugins_loaded', 'nensa_admin_lang_init');
+function nensa_admin_lang_init() {
 	load_plugin_textdomain( 'nensa_admin', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 }

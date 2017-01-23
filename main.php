@@ -71,13 +71,13 @@ class nensa_admin {
 	}
 	
 	public function nensa_admin_register(){
-    $wp_csv_to_db_page = add_submenu_page( 'options-general.php', __('NENSA Admin','nensa_admin'), __('NENSA Admin','nensa_admin'), 'manage_options', 'nensa_admin_menu_page', array( $this, 'nensa_admin_menu_page' )); // Add submenu page to "Settings" link in WP
-		add_action( 'admin_print_scripts-' . $wp_csv_to_db_page, array( $this, 'nensa_admin_admin_scripts' ) );  // Load our admin page scripts (our page only)
-		add_action( 'admin_print_styles-' . $wp_csv_to_db_page, array( $this, 'nensa_admin_admin_styles' ) );  // Load our admin page stylesheet (our page only)
+    $nensa_admin_page = add_submenu_page( 'options-general.php', __('NENSA Admin','nensa_admin'), __('NENSA Admin','nensa_admin'), 'manage_options', 'nensa_admin_menu_page', array( $this, 'nensa_admin_menu_page' )); // Add submenu page to "Settings" link in WP
+		add_action( 'admin_print_scripts-' . $nensa_admin_page, array( $this, 'nensa_admin_admin_scripts' ) );  // Load our admin page scripts (our page only)
+		add_action( 'admin_print_styles-' . $nensa_admin_page, array( $this, 'nensa_admin_admin_styles' ) );  // Load our admin page stylesheet (our page only)
 	}
 	
 	public function nensa_admin_settings() {
-		register_setting('wp_csv_to_db_options', $this->option_name, array($this, 'nensa_admin_validate'));
+		register_setting('nensa_admin_options', $this->option_name, array($this, 'nensa_admin_validate'));
 	}
 	
 	public function nensa_admin_validate($input) {

@@ -453,8 +453,8 @@ class nensa_admin {
 $nensa_admin = new nensa_admin();
 
 //  Ajax call for showing table column names
-add_action( 'wp_ajax_wp_csv_to_db_get_columns', 'wp_csv_to_db_get_columns_callback' );
-function wp_csv_to_db_get_columns_callback() {
+add_action( 'wp_ajax_wp_csv_to_db_get_columns', 'nensa_admin_get_columns_callback' );
+function nensa_admin_get_columns_callback() {
 	
 	// Set variables
 	global $wpdb1;
@@ -553,8 +553,8 @@ function wp_csv_to_db_get_columns_callback() {
 }
 
 // Ajax call to process .csv file for column count
-add_action('wp_ajax_wp_csv_to_db_get_csv_cols','wp_csv_to_db_get_csv_cols_callback');
-function wp_csv_to_db_get_csv_cols_callback() {
+add_action('wp_ajax_wp_csv_to_db_get_csv_cols','nensa_admin_get_csv_cols_callback');
+function nensa_admin_get_csv_cols_callback() {
 	
 	// Get file upload url
 	$file_upload_url = $_POST['file_upload_url'];

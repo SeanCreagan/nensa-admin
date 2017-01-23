@@ -63,7 +63,7 @@ class nensa_admin {
 	}
 	
   public function nensa_admin_plugins_loaded(){
-      $this->handle_csv_export_action();
+      
   }
         
 	public function nensa_admin_activate() {
@@ -119,64 +119,6 @@ class nensa_admin {
 		$options = get_option($this->option_name);
 		$select_theme = isset($options['jq_theme']) ? $options['jq_theme'] : 'smoothness';
 		?><link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/<?php echo $select_theme; ?>/jquery-ui.css"><?php  // For jquery ui styling - Direct from jquery
-	}
-
-        public function handle_csv_export_action(){
-            	if ((isset($_POST['export_to_csv_button'])) && (!empty($_POST['table_select']))) {
-                    if(!current_user_can('manage_options')){
-                        wp_die('Error! Only site admin can perform this operation');
-                    }
-
-                    $this->CSV_GENERATE($_POST['table_select']);
-		}
-        }
-        
-	// Helper function for .csv file exportation
-	public function CSV_GENERATE($getTable) {
-		ob_end_clean();
-		global $wpdb1;
-		$field='';
-		$getField ='';
-	
-		if($getTable){
-			$result = $wpdb1->get_results("SELECT * FROM $getTable");
-			$requestedTable = mysql_query("SELECT * FROM ".$getTable);
-	
-			$fieldsCount = mysql_num_fields($requestedTable);
-	
-			for($i=0; $i<$fieldsCount; $i++){
-				$field = mysql_fetch_field($requestedTable);
-				$field = (object) $field;         
-				$getField .= $field->name.',';
-			}
-	
-			$sub = substr_replace($getField, '', -1);
-			$fields = $sub; // Get fields names
-			$each_field = explode(',', $sub);
-			$csv_file_name = $getTable.'_'.date('Ymd_His').'.csv'; 
-	
-			// Get fields values with last comma excluded
-			foreach($result as $row){
-				for($j = 0; $j < $fieldsCount; $j++){
-					if($j == 0) $fields .= "\n"; // Force new line if loop complete
-					$value = str_replace(array("\n", "\n\r", "\r\n", "\r"), "\t", $row->$each_field[$j]); // Replace new line with tab
-					$value = str_getcsv ( $value , ",", "\"" , "\\"); // SEQUENCING DATA IN CSV FORMAT, REQUIRED PHP >= 5.3.0
-					$fields .= $value[0].','; // Separate fields with comma
-				}
-				$fields = substr_replace($fields, '', -1); // Remove extra space at end of string
-			}
-	
-			//header("Content-type: text/x-csv");
-			header("Content-type: text/csv");
-			header("Content-Transfer-Encoding: binary");
-			header("Content-Disposition: attachment; filename=".$csv_file_name);
-			header("Content-type: application/x-msdownload");
-			header("Pragma: no-cache");
-			header("Expires: 0"); 
-	
-			echo $fields; 
-			exit;
-		}
 	}
 	
 	public function nensa_admin_menu_page() {
@@ -366,19 +308,18 @@ class nensa_admin {
         
             <h2><?php _e('NENSA CSV to Results Database Options','nensa_admin'); ?></h2>
             
-            <p>This plugin allows you to insert CSV file data into the NENSA Results database table. You can also export the content of a database using this plugin.</p>
-			<p><a href="http://www.tipsandtricks-hq.com/wp-csv-to-database-plugin-import-excel-file-content-into-wordpress-database-2116" target="_blank">Visit the plugin page</a> for more details and usage instruction.</p>
+            <p>This plugin allows you to manage NENSA Result, Member and Event data.</p>
             
             <div id="tabs">
-                <ul>
-    				<li><a href="#tabs-1"><?php _e('Settings','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-2"><?php _e('Events','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-3"><?php _e('NEON','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-4"><?php _e('Member Season','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-5"><?php _e('Member Skier','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-6"><?php _e('Results','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-6"><?php _e('DataTables','nensa_admin'); ?></a></li>
-                </ul>
+              <ul>
+		    				<li><a href="#tabs-1"><?php _e('Settings','nensa_admin'); ?></a></li>
+		    				<li><a href="#tabs-2"><?php _e('Events','nensa_admin'); ?></a></li>
+		    				<li><a href="#tabs-3"><?php _e('NEON','nensa_admin'); ?></a></li>
+		    				<li><a href="#tabs-4"><?php _e('Member Season','nensa_admin'); ?></a></li>
+		    				<li><a href="#tabs-5"><?php _e('Member Skier','nensa_admin'); ?></a></li>
+		    				<li><a href="#tabs-6"><?php _e('Results','nensa_admin'); ?></a></li>
+		    				<li><a href="#tabs-6"><?php _e('DataTables','nensa_admin'); ?></a></li>
+              </ul>
                 
               <div id="tabs-1">
                 

@@ -318,7 +318,7 @@ class nensa_admin {
 		    				<li><a href="#tabs-4"><?php _e('Member Season','nensa_admin'); ?></a></li>
 		    				<li><a href="#tabs-5"><?php _e('Member Skier','nensa_admin'); ?></a></li>
 		    				<li><a href="#tabs-6"><?php _e('Results','nensa_admin'); ?></a></li>
-		    				<li><a href="#tabs-6"><?php _e('DataTables','nensa_admin'); ?></a></li>
+		    				<li><a href="#tabs-7"><?php _e('DataTables','nensa_admin'); ?></a></li>
               </ul>
                 
               <div id="tabs-1">
@@ -417,10 +417,10 @@ class nensa_admin {
                 </div> <!-- End tab 3 -->
                 
                 <div id="tabs-4">
-
+                	<?php	import_member_season(); ?>
                 </div> <!-- End tab 4 -->
                 <div id="tabs-5">
-									
+									<?php	import_member_skier(); ?>
                 </div> <!-- End tab 5 -->
                 <div id="tabs-6">
 									<?php	import_results(); ?>

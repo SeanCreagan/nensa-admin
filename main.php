@@ -649,10 +649,10 @@ function wp_csv_to_db_get_csv_cols_callback() {
 }
 
 // Add plugin settings link to plugins page
-add_filter( 'plugin_action_links', 'wp_csv_to_db_plugin_action_links', 10, 4 );
-function wp_csv_to_db_plugin_action_links( $links, $file ) {
+add_filter( 'plugin_action_links', 'nensa_admin_plugin_action_links', 10, 4 );
+function nensa_admin_plugin_action_links( $links, $file ) {
 	
-	$plugin_file = 'wp_csv_to_db/main.php';
+	$plugin_file = 'nensa_admin/main.php';
 	if ( $file == $plugin_file ) {
 		$settings_link = '<a href="' .
 			admin_url( 'options-general.php?page=nensa_admin_menu_page' ) . '">' .

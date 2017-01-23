@@ -323,7 +323,7 @@ class nensa_admin {
                 
               <div id="tabs-1">
                 
-        			<form id="wp_csv_to_db_form" method="post" action="">
+        			<form id="nensa_admin_form" method="post" action="">
                     <table class="form-table"> 
                         
                         <tr valign="top"><th scope="row"><?php _e('Select Database Table:','nensa_admin'); ?></th>
@@ -553,7 +553,7 @@ function nensa_admin_get_columns_callback() {
 }
 
 // Ajax call to process .csv file for column count
-add_action('wp_ajax_wp_csv_to_db_get_csv_cols','nensa_admin_get_csv_cols_callback');
+add_action('wp_ajax_nensa_admin_get_csv_cols','nensa_admin_get_csv_cols_callback');
 function nensa_admin_get_csv_cols_callback() {
 	
 	// Get file upload url

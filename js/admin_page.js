@@ -25,7 +25,7 @@ jQuery(document).ready(function($) {
 		
 		// Setup ajax variable
 		var data = {
-			action: 'wp_csv_to_db_get_csv_cols',
+			action: 'nensa_admin_get_csv_cols',
 			file_upload_url: file_upload_url
 		};
 		
@@ -200,7 +200,7 @@ jQuery(document).ready(function($) {
 			'Delete Table': function() {
 				$('#delete_db_button_hidden').val('true');
 				$(this).dialog('close');
-				$('#wp_csv_to_db_form').submit();
+				$('#nensa_admin_form').submit();
 			},
 			'Cancel': function() {
 				$(this).dialog("close");

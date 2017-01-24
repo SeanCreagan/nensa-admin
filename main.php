@@ -11,6 +11,7 @@
 include ("import_functions.php");
 include ("load_tables.php");
 include ("connection.php");
+include ("neon_fetch.php");
 
 add_action( 'admin_enqueue_scripts', 'my_enqueue' );
 function my_enqueue($hook) {
@@ -312,28 +313,30 @@ class nensa_admin {
             
             <div id="tabs">
               <ul>
-		    				<li><a href="#tabs-1"><?php _e('Settings','nensa_admin'); ?></a></li>
+		    				<li><a href="#tabs-1"><?php _e('Search Neon','nensa_admin'); ?></a></li>
 		    				<li><a href="#tabs-2"><?php _e('Events','nensa_admin'); ?></a></li>
 		    				<li><a href="#tabs-3"><?php _e('NEON','nensa_admin'); ?></a></li>
 		    				<li><a href="#tabs-4"><?php _e('Member Season','nensa_admin'); ?></a></li>
 		    				<li><a href="#tabs-5"><?php _e('Member Skier','nensa_admin'); ?></a></li>
 		    				<li><a href="#tabs-6"><?php _e('Results','nensa_admin'); ?></a></li>
 		    				<li><a href="#tabs-7"><?php _e('DataTables','nensa_admin'); ?></a></li>
+                                                <li><a href="#tabs-8"><?php _e('Settings','nensa_admin'); ?></a></li>
+		    				
               </ul>
                 
-              <div id="tabs-1">
+              <div id="tabs-8">
                 
         			<form id="nensa_admin_form" method="post" action="">
                     <table class="form-table"> 
                         
-                        <tr valign="top"><th scope="row"><?php _e('Select Database Table:','nensa_admin'); ?></th>
+                        <tr valign="top"><th scope="row"><?php _e('Select Season:','nensa_admin'); ?></th>
                             <td>
                                 <select id="table_select" name="table_select" value="">
                                 <option name="" value=""></option>
                                 
                                 <?php  // Get all db table names
                                 global $wpdb1;
-                                $sql = "SHOW TABLES";
+                                $sql = "SELECT DISTINCT(season) FROM Race_Event ORDER BY season DESC";
                                 $results = $wpdb1->get_results($sql);
                                 $repop_table = isset($_POST['table_select']) ? $_POST['table_select'] : null;
                                 
@@ -353,6 +356,7 @@ class nensa_admin {
                                 
                                 <?php  // Get all db table names
                                 global $wpdb1;
+                                echo $repop_table;
                                 $sql = "SELECT  event_name  FROM RACE_EVENT WHERE season=2017 AND parent_event_id<>0;";
                                 $results = $wpdb1->get_results($sql);
                                 $repop_table = isset($_POST['event_select']) ? $_POST['event_select'] : null;
@@ -424,10 +428,13 @@ class nensa_admin {
                 </div> <!-- End tab 5 -->
                 <div id="tabs-6">
 									<?php	import_results(); ?>
-                </div> <!-- End tab 5 -->
-                <div id="tabs-6">
+                </div> <!-- End tab 6 -->
+                <div id="tabs-7">
 									
-                </div> <!-- End tab 5 -->
+                </div> <!-- End tab 7 -->
+                <div id="tabs-1">
+									<?php	search_neon_for_racer(); ?>
+                </div> <!-- End tab 8 -->
             </div> <!-- End #tabs -->
         </div> <!-- End page wrap -->
         

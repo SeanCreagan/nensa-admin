@@ -26,8 +26,8 @@ $neon = new Neon();
 
 /* Set your API credentials */
 $credentials = array(
-    'orgId' => '',
-    'apiKey' => ''
+    'orgId' => NEON_USER,
+    'apiKey' => NEON_APIKEY
 );
 
 /* Authenticate with the API */

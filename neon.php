@@ -83,7 +83,7 @@ class Neon
       $str = null;
       if (isset($request['parameters'])) {
         $str = http_build_query($request['parameters']);
-        }
+      }
       $parameters = 'responseType=json&userSessionId=' . $this->getSession() . '&' . $str;
       $build = array();
       $build['method'] = $request['method'];

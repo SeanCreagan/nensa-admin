@@ -1,6 +1,7 @@
 <?php 
 
-function search_neon_for_racer() {
+function fetch_racer_from_neon() {
+
 
 /* Include the NeonCRM PHP Library */
 require_once('neon.php');
@@ -75,8 +76,9 @@ if ( isset( $loginResult['operationResult'] ) && $loginResult['operationResult']
 
     /* If there are search criteria present, execute the search query */
     if ( !empty( $search['criteria'] ) ) {
-        $result = $neon->search($search);
-        $result_1 = $neon->go( array( 'method' => 'account/retrieveIndividualAccount', 'parameters' => array('accountId'=>$searchCriteria['accountID'])));
+        $result = $neon->go( array( 'method' => 'account/retrieveIndividualAccount', 'parameters' => array('accountId'=>$searchCriteria['accountID'])));
+        // print_r($result);
+        //$result = $neon->search($search);
         $message = 'No results match your search.';
     } else {
         $result = null;
@@ -99,7 +101,7 @@ if ( isset( $loginResult['operationResult'] ) && $loginResult['operationResult']
                 </br>
                 <form action=# method="POST" class="form-inline">
                     <fieldset>
-                        <strong><legend>Search Criteria</legend></strong></br>
+                        <legend>Search Criteria</legend>
                             <div class="form-group">
                                 <label>NENSA #</label>
                                 <input type="text" class="form-control" name="accountID" value="<?php echo htmlentities( $searchCriteria['accountID'] ); ?>"/>
@@ -149,7 +151,6 @@ if ( isset( $loginResult['operationResult'] ) && $loginResult['operationResult']
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-                </br><?php print_r($result_1); ?></br>
                 <?php else: ?>
                     <p><?php echo $message; ?></p>
                 <?php endif; ?>

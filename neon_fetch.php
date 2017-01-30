@@ -95,29 +95,31 @@ function search_neon_for_racer() {
 
 
 
-  <h1>Account AAA Search</h1>
+  <h1>NENSA Member Lookup</h1>
   </br>
-  <form action=# method="POST" class="form-inline">
-    <fieldset>
-      <strong><legend>Search Criteria</legend></strong></br>
-        <div class="form-group">
-            <label>NENSA #</label>
-            <input type="text" class="form-control" name="accountID" value="<?php echo htmlentities( $searchCriteria['accountID'] ); ?>"/>
-        </div></br>
-        <div class="form-group">
-            <label>First Name</label>
-            <input type="text" class="form-control" name="firstName" value="<?php echo htmlentities( $searchCriteria['firstName'] ); ?>"/>
-        </div></br>
-        <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" class="form-control" name="lastName" value="<?php echo htmlentities( $searchCriteria['lastName'] ); ?>" />
-        </div></br>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="text" class="form-control" name="email" value="<?php echo htmlentities( $searchCriteria['email'] ); ?>" />
-        </div></br>
-        <input type="submit" value="Search" class="btn btn-default" /></br>
-    </fieldset>
+  <form action=# method="POST" style="background-color: GAINSBORO;">
+    <table class="form-table"> 
+      <tr >
+        <th style="padding-left: 12px;">NENSA ID</th>
+        <th></th>
+        <th style="padding-left: 12px;">Last Name</th>
+        <th style="padding-left: 12px;">First Name</th>
+      </tr>
+      <tr valign="top">
+        <td width="5%">
+          <input type="text" name="accountID" value="<?php echo htmlentities( $searchCriteria['accountID'] ); ?>"/>
+        </td>
+        <td width="5%">OR</td>
+        <td width="5%">
+          <input type="text" name="lastName" value="<?php echo htmlentities( $searchCriteria['lastName'] ); ?>" />
+        <td width="5%">
+          <input type="text" name="firstName" value="<?php echo htmlentities( $searchCriteria['firstName'] ); ?>" />
+        </td><td></td>
+      </tr>
+    </table>
+      <p class="submit" style="padding-left: 12px;">
+        <input type="submit" class="button-primary" value="<?php _e('Submit', 'nensa_admin') ?>" /></br>
+      </p>
   </form>
   </br>
   <hr>

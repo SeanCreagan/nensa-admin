@@ -59,14 +59,9 @@ function search_neon_for_racer() {
     if ( isset( $searchCriteria['accountID'] ) && !empty( $searchCriteria['accountID'] ) ) {
         $search['criteria'][] = array( 'Account ID', 'EQUAL', $searchCriteria['accountID'] );
     }
-    if ( isset( $searchCriteria['firstName'] ) && !empty( $searchCriteria['firstName'] ) ) {
+    if ( isset( $searchCriteria['firstName'] ) && !empty( $searchCriteria['firstName'] ) && isset( $searchCriteria['lastName'] ) && !empty( $searchCriteria['lastName'] )){
         $search['criteria'][] = array( 'First Name', 'EQUAL', $searchCriteria['firstName'] );
-    }
-    if ( isset( $searchCriteria['lastName'] ) && !empty( $searchCriteria['lastName'] ) ) {
         $search['criteria'][] = array( 'Last Name', 'EQUAL', $searchCriteria['lastName'] );
-    }
-    if ( isset( $searchCriteria['email'] ) && !empty( $searchCriteria['email'] ) ) {
-        $search['criteria'][] = array( 'Email', 'EQUAL', $searchCriteria['email'] );
     }
 
     /**
@@ -130,23 +125,22 @@ function search_neon_for_racer() {
    *******************************************/
   ?>
   <?php if( isset($result['page']['totalResults'] ) && $result['page']['totalResults'] >= 1 ): ?>
-  <table class="table table-striped">
+  <table class="table table-striped" style="border-style: solid; border-width: 1px; background-color: white;">
       <thead>
           <tr>
-              <th>NENSA #</th>
-              <th>USSA #</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Location</th>
+              <th align="left">NENSA #</th>
+              <th align="left">Name</th>
+              <th align="left">Email</th>
+              <th align="left">Location</th>
           </tr>
       </thead>
-      <tbody>
+      <tbody style="background-color: GAINSBORO;">
           <?php foreach($result['searchResults'] as $r): ?>
-          <tr>
-              <td><?php echo $r['Account ID']; ?> 
-              <td><?php echo $r['First Name']; ?> <?php echo $r['Last Name']; ?></td>
-              <td><?php echo $r['Email 1']; ?></td>
-              <td><?php echo $r['City']; ?> <?php echo $r['State']; ?></td>
+          <tr >
+              <td width="15%"><?php echo $r['Account ID']; ?> 
+              <td width="15%"><?php echo $r['First Name']; ?> <?php echo $r['Last Name']; ?></td>
+              <td width="15%"><?php echo $r['Email 1']; ?></td>
+              <td width="15%"><?php echo $r['City']; ?> <?php echo $r['State']; ?></td>
           </tr>
           <?php endforeach; ?>
       </tbody>

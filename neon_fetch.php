@@ -2,40 +2,40 @@
 
 function search_neon_for_racer() {
 
-/* Include the NeonCRM PHP Library */
-require_once('neon.php');
+  /* Include the NeonCRM PHP Library */
+  require_once('neon.php');
 
-/**
- * POST Data
- **********************************************/
+  /**
+   * POST Data
+   **********************************************/
 
-/* Retrieve and sanitize POST data */
-$arguments = array(
-    'accountID' => FILTER_SANITIZE_SPECIAL_CHARS,
-    'firstName' => FILTER_SANITIZE_SPECIAL_CHARS,
-    'lastName'  => FILTER_SANITIZE_SPECIAL_CHARS,
-    'email'     => FILTER_SANITIZE_EMAIL,
-);
-$searchCriteria = filter_input_array( INPUT_POST, $arguments );
+  /* Retrieve and sanitize POST data */
+  $arguments = array(
+      'accountID' => FILTER_SANITIZE_SPECIAL_CHARS,
+      'firstName' => FILTER_SANITIZE_SPECIAL_CHARS,
+      'lastName'  => FILTER_SANITIZE_SPECIAL_CHARS,
+      'email'     => FILTER_SANITIZE_EMAIL,
+  );
+  $searchCriteria = filter_input_array( INPUT_POST, $arguments );
 
-/**
- * API Authentication
- *******************************************/
+  /**
+   * API Authentication
+   *******************************************/
 
-/* Instantiate the Neon class */
-$neon = new Neon();
+  /* Instantiate the Neon class */
+  $neon = new Neon();
 
-/* Set your API credentials */
-$credentials = array(
-    'orgId' => NEON_USER,
-    'apiKey' => NEON_APIKEY
-);
+  /* Set your API credentials */
+  $credentials = array(
+      'orgId' => NEON_USER,
+      'apiKey' => NEON_APIKEY
+  );
 
-/* Authenticate with the API */
-$loginResult = $neon->login($credentials);
+  /* Authenticate with the API */
+  $loginResult = $neon->login($credentials);
 
-/* Upon successful authentication, proceed with building the search query */
-if ( isset( $loginResult['operationResult'] ) && $loginResult['operationResult'] == 'SUCCESS' ) {
+  /* Upon successful authentication, proceed with building the search query */
+  if ( isset( $loginResult['operationResult'] ) && $loginResult['operationResult'] == 'SUCCESS' ) {
 
     /**
      * Search Query
@@ -76,7 +76,7 @@ if ( isset( $loginResult['operationResult'] ) && $loginResult['operationResult']
     /* If there are search criteria present, execute the search query */
     if ( !empty( $search['criteria'] ) ) {
         $result = $neon->search($search);
-        $result_1 = $neon->go( array( 'method' => 'account/retrieveIndividualAccount', 'parameters' => array('accountId'=>$searchCriteria['accountID'])));
+        //$result_1 = $neon->go( array( 'method' => 'account/retrieveIndividualAccount', 'parameters' => array('accountId'=>$searchCriteria['accountID'])));
         $message = 'No results match your search.';
     } else {
         $result = null;
@@ -86,73 +86,73 @@ if ( isset( $loginResult['operationResult'] ) && $loginResult['operationResult']
     /* Logout - terminate API session with the server */
     $neon->go( array( 'method' => 'common/logout' ) );
 
-} else {
-    $result = null;
-    $message = 'There was a problem connecting to NeonCRM.';
-}
+  } else {
+      $result = null;
+      $message = 'There was a problem connecting to NeonCRM.';
+  }
 
-?>
+  ?>
 
 
 
-                <h1>Account Search</h1>
-                </br>
-                <form action=# method="POST" class="form-inline">
-                    <fieldset>
-                        <strong><legend>Search Criteria</legend></strong></br>
-                            <div class="form-group">
-                                <label>NENSA #</label>
-                                <input type="text" class="form-control" name="accountID" value="<?php echo htmlentities( $searchCriteria['accountID'] ); ?>"/>
-                            </div></br>
-                            <div class="form-group">
-                                <label>First Name</label>
-                                <input type="text" class="form-control" name="firstName" value="<?php echo htmlentities( $searchCriteria['firstName'] ); ?>"/>
-                            </div></br>
-                            <div class="form-group">
-                                <label>Last Name</label>
-                                <input type="text" class="form-control" name="lastName" value="<?php echo htmlentities( $searchCriteria['lastName'] ); ?>" />
-                            </div></br>
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="text" class="form-control" name="email" value="<?php echo htmlentities( $searchCriteria['email'] ); ?>" />
-                            </div></br>
-                            <input type="submit" value="Search" class="btn btn-default" /></br>
-                    </fieldset>
-                </form>
-                </br>
-                <hr>
+  <h1>Account AAA Search</h1>
+  </br>
+  <form action=# method="POST" class="form-inline">
+    <fieldset>
+      <strong><legend>Search Criteria</legend></strong></br>
+        <div class="form-group">
+            <label>NENSA #</label>
+            <input type="text" class="form-control" name="accountID" value="<?php echo htmlentities( $searchCriteria['accountID'] ); ?>"/>
+        </div></br>
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" class="form-control" name="firstName" value="<?php echo htmlentities( $searchCriteria['firstName'] ); ?>"/>
+        </div></br>
+        <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" class="form-control" name="lastName" value="<?php echo htmlentities( $searchCriteria['lastName'] ); ?>" />
+        </div></br>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-control" name="email" value="<?php echo htmlentities( $searchCriteria['email'] ); ?>" />
+        </div></br>
+        <input type="submit" value="Search" class="btn btn-default" /></br>
+    </fieldset>
+  </form>
+  </br>
+  <hr>
 
-                <?php
-                /**
-                 * Iterate through API results
-                 *******************************************/
-                ?>
-                <?php if( isset($result['page']['totalResults'] ) && $result['page']['totalResults'] >= 1 ): ?>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>NENSA #</th>
-                            <th>USSA #</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Location</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach($result['searchResults'] as $r): ?>
-                        <tr>
-                            <td><?php echo $r['Account ID']; ?> 
-                            <td><?php echo $r['First Name']; ?> <?php echo $r['Last Name']; ?></td>
-                            <td><?php echo $r['Email 1']; ?></td>
-                            <td><?php echo $r['City']; ?> <?php echo $r['State']; ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                </br><?php print_r($result_1); ?></br>
-                <?php else: ?>
-                    <p><?php echo $message; ?></p>
-                <?php endif; ?>
+  <?php
+  /**
+   * Iterate through API results
+   *******************************************/
+  ?>
+  <?php if( isset($result['page']['totalResults'] ) && $result['page']['totalResults'] >= 1 ): ?>
+  <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>NENSA #</th>
+              <th>USSA #</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Location</th>
+          </tr>
+      </thead>
+      <tbody>
+          <?php foreach($result['searchResults'] as $r): ?>
+          <tr>
+              <td><?php echo $r['Account ID']; ?> 
+              <td><?php echo $r['First Name']; ?> <?php echo $r['Last Name']; ?></td>
+              <td><?php echo $r['Email 1']; ?></td>
+              <td><?php echo $r['City']; ?> <?php echo $r['State']; ?></td>
+          </tr>
+          <?php endforeach; ?>
+      </tbody>
+  </table>
+  </br><?php //print_r($result_1); ?></br>
+  <?php else: ?>
+      <p><?php echo $message; ?></p>
+  <?php endif; ?>
 
 <?php
 }

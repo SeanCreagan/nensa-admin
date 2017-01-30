@@ -136,26 +136,26 @@ class nensa_admin {
 		?>
 		<div class="wrap">
         
-        <h2><?php _e('NENSA Result, Event and Member Management','nensa_admin'); ?></h2>
+      <h2><?php _e('NENSA Result, Event and Member Management','nensa_admin'); ?></h2>
+      
+      <p>This plugin allows you to manage NENSA Result, Member and Event data.</p>
+      
+      <div id="tabs">
+        <ul>
+  				<li><a href="#tabs-1"><?php _e('Member Lookup','nensa_admin'); ?></a></li>
+  				<li><a href="#tabs-2"><?php _e('Load Results','nensa_admin'); ?></a></li>
+  				<li><a href="#tabs-3"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
+        </ul>
+          <div id="tabs-1">
+          	<?php	 search_neon_for_racer(); ?>
+          </div> <!-- End tab 1 -->
+          <div id="tabs-2">
+          	<?php	import_results(); ?>
+          </div> <!-- End tab 2 -->
+          <div id="tabs-3">
         
-        <p>This plugin allows you to manage NENSA Result, Member and Event data.</p>
-        
-        <div id="tabs">
-          <ul>
-    				<li><a href="#tabs-1"><?php _e('Search Neon','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-2"><?php _e('Load Results','nensa_admin'); ?></a></li>
-    				<li><a href="#tabs-3"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
-          </ul>
-            <div id="tabs-1">
-            	<?php	 search_neon_for_racer(); ?>
-            </div> <!-- End tab 1 -->
-            <div id="tabs-2">
-            	<?php	import_results(); ?>
-            </div> <!-- End tab 2 -->
-            <div id="tabs-3">
-          
-            </div> <!-- End tab 3 -->
-        </div> <!-- End #tabs -->
+          </div> <!-- End tab 3 -->
+      </div> <!-- End #tabs -->
     </div> <!-- End page wrap -->
     
     

@@ -12,7 +12,7 @@ global $wpdb1;
 	</br><strong>Load 2016/2017 Event Data</strong></br>
 	</br>
 
-	<form name="import" method="post" enctype="multipart/form-data">
+	<form id="import" name="import" method="post" enctype="multipart/form-data">
 		<table class="form-table"> 
       <tr valign="top"><th scope="row"><?php _e('Select Season:','nensa_admin'); ?></th>
         <td>
@@ -52,7 +52,12 @@ global $wpdb1;
 	if(isset($_POST["submit"]))
 	{
 
-		$event_name = $_POST['event_select'];
+		if(isset($_POST["event_select"])) {
+			$event_name = $_POST['event_select']; 
+		} else {
+	  	echo 'Select an event. ';
+			return;
+	  }
 
 		$result = $conn->query("SELECT event_id FROM RACE_EVENT WHERE event_name='$event_name'");
 			
@@ -60,16 +65,20 @@ global $wpdb1;
 			$row = $result->fetch_assoc();
 	    $event_id = (int)$row['event_id'];
 	  } else {
-	  	echo 'ERROR: Event Not Matched in Database. ';
-			exit;
+	  	echo 'Event Not Matched in Database. ';
+			return;
 	    $event_id = NULL;
 	  }
 
-		$file = $_FILES['file']['tmp_name'];
-
+		if(isset($_FILES['file'])) {
+			$file = $_FILES['file']['tmp_name'];
+		} else {
+	  	echo 'Select a file ';
+			return;
+		}
 		if ($_FILES['file']['type'] != 'text/csv') {
-			echo 'ERROR: The import format must be CSV. ';
-			exit;
+			echo 'The import format must be CSV ';
+			return;
 		}
 
 		$handle = fopen($file, "r");

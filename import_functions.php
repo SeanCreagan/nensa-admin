@@ -7,42 +7,64 @@
 
 function import_results() {
 
+global $wpdb1;
 ?>
-	</br><strong>Load Inidividual Event CSV Data</strong></br>
-  </br>
-    <strong>
-	    Default setting appends row to the table.</br>  
-	    Auto delete not coded yet. </br>Select list for indexes conforms to my personal list. </br> 
-	    Adjust accordingly in the code
-  	</strong>
-	</br></br>
+	</br><strong>Load 2016/2017 Event Data</strong></br>
+	</br>
 
 	<form name="import" method="post" enctype="multipart/form-data">
-		<select name="EventID">
-			<option value=1951>1951</option>
-			<option value=1952>1952</option>
-			<option value=1953>1953</option>
-			<option value=1954>1954</option>
-			<option value=1955>1955</option>
-			<option value=1956>1956</option>
-			<option value=1957>1957</option>
-			<option value=1961>1961</option>
-			<option value=1962>1962</option>
-			<option value=1963>1963</option>
-			<option value=1964>1964</option>
-			<option value=1965>1965</option>
-			<option value=1966>1966</option>
-		</select>
-  	<input type="file" name="file" /></br></br>
-    <input type="submit" name="submit" value="Submit Race Results" />
+		<table class="form-table"> 
+      <tr valign="top"><th scope="row"><?php _e('Select Season:','nensa_admin'); ?></th>
+        <td>
+			    <select id="event_select" name="event_select" value="">
+			        <option name="" value=""></option>
+			        
+			        <?php  // Get all db table names
+			        global $wpdb1;
+			        $sql = "SELECT  event_name  FROM RACE_EVENT WHERE season=2017 AND parent_event_id<>0;";
+			        $results = $wpdb1->get_results($sql);
+			        $repop_table = isset($_POST['event_select']) ? $_POST['event_select'] : null;
+			        
+			        foreach($results as $index => $value) {
+			            foreach($value as $eventName) {
+			                ?><option name="<?php echo $eventName ?>" value="<?php echo $eventName ?>" <?php if($repop_table === $eventName) { echo 'selected="selected"'; } ?>><?php echo $eventName ?></option><?php
+			            }
+			        }
+			        ?>
+			    </select>
+			  </td>
+			</tr>
+			 <tr valign="top"><th scope="row"><?php _e('Select CSV File:','nensa_admin'); ?></th>
+			  <td>
+			  	<input type="file" name="file" />
+			  </td>
+			</tr>
+		</table>
+		<p class="submit">
+	    <input type="submit" name="submit" class="button-primary" value="<?php _e('Import Event', 'nensa_admin') ?>" />
+	  </p>
   </form>
+
 
 <?php
 	include ("connection.php");
   ini_set('auto_detect_line_endings', true);
 	if(isset($_POST["submit"]))
 	{
-		$event_id = (int)$_POST['EventID']; 
+
+		$event_name = $_POST['event_select'];
+
+		$result = $conn->query("SELECT event_id FROM RACE_EVENT WHERE event_name='$event_name'");
+			
+	  if ($result->num_rows == 1) {
+			$row = $result->fetch_assoc();
+	    $event_id = (int)$row['event_id'];
+	  } else {
+	  	echo 'ERROR: Event Not Matched in Database. ';
+			exit;
+	    $event_id = NULL;
+	  }
+
 		$file = $_FILES['file']['tmp_name'];
 
 		if ($_FILES['file']['type'] != 'text/csv') {
@@ -52,6 +74,9 @@ function import_results() {
 
 		$handle = fopen($file, "r");
 		$c = 0;
+		$e = 0;
+		$d = 0;
+		$m = 0;
 		$sql = null;
 		$u16 = false;
 	  $correct_header = false;
@@ -116,22 +141,29 @@ function import_results() {
       	$member_season_id = NULL;
       }
 
-			// rules will go here
+      // Skip over duplicate entry
+      $result = $conn->query("SELECT * FROM RACE_RESULTS WHERE event_id='$event_id' AND ussa_num='$athlete_id'");
+      $count = mysqli_num_rows($result);
+      if ($count > 0) { 
+      	$d += 1;
+      	continue; 
+      }
+			
 			$sql = mysqli_query($conn, "INSERT INTO RACE_RESULTS (world_cup_points, member_season_id, ussa_num, Finish_Place, Full_Name, Birth_Year, Race_Points, USSA_Result, event_id, Division, Race_Time) VALUES (NULLIF('$wcp',0), NULLIF('$member_season_id',0), '$athlete_id', '$finish_place', '$full_name', '$birth_year', '$points','$ussa_results', '$event_id', '$division', '$race_time')");
       
       if ($sql == 0) {
-		    $text = "member_season_id: ".$member_season_id." error: ".$conn->error;
-		    echo $text;
-		  }
-
-      $c = $c + 1;
+		    $text = $conn->error;
+	    	if (strpos($text, 'Duplicate entry') !== false) {
+				  $m += 1;
+				} else {
+					$e += 1;
+				}
+		  } else {
+		  	$c += 1;
+		  } 
 		}
 
-		if($sql){
-			echo "You database has imported successfully. You have inserted ". $c ." records";
-		}else{
-			echo "Sorry! ".$c." There is some problem with ".$file;
-		}
+		echo "You have imported ". $c ." results. You skipped over ". $d ." duplicate records. There were ". $m ." member_season_id conflicts. There were ". $e ." errors.";
 
 	}
 }

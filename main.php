@@ -13,7 +13,31 @@ include ("load_tables.php");
 include ("connection.php");
 include ("neon_fetch.php");
 include ("neon_retrieve.php");
+include ("create_event.php");
 
+/*
+add_action( 'admin_enqueue_scripts', 'my_enqueue' );
+function my_enqueue($hook) {
+	if (!strpos($hook, 'nensa_admin') !== false) {
+	  	return;
+	} 
+        
+	wp_enqueue_script( 'ajax-script', plugins_url( '/js/nensa_ajax.js', __FILE__ ), array('jquery') );
+
+	// in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
+	wp_localize_script( 'ajax-script', 'ajax_object',
+  array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'season' => 2015 ) );
+}
+
+// Same handler function...
+add_action( 'wp_ajax_jn_select', 'jn_select_callback' );
+function jn_select_callback() {
+	global $wpdb;
+	$season = intval( $_POST['season'] );
+  echo $season;
+	wp_die();
+}
+*/
 class nensa_admin {
 
 	// Setup options variables
@@ -82,6 +106,11 @@ class nensa_admin {
 		wp_enqueue_script('thickbox');  // For WP media uploader
 		wp_enqueue_script('jquery-ui-tabs');  // For admin panel page tabs
 		wp_enqueue_script('jquery-ui-dialog');  // For admin panel popup alerts
+
+		wp_enqueue_script( 'ajax-script', plugins_url( '/js/nensa_ajax.js', __FILE__ ), array('jquery') );
+
+		// in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
+		wp_localize_script( 'ajax-script', 'ajax_object',	array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'season' => 2014 ) );
 		
 		wp_enqueue_script( 'nensa_admin', plugins_url( '/js/admin_page.js', __FILE__ ), array('jquery') );  // Apply admin page scripts
 		wp_localize_script( 'nensa_admin', 'wp_csv_to_db_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
@@ -144,17 +173,54 @@ class nensa_admin {
         <ul>
   				<li><a href="#tabs-1"><?php _e('Member Lookup','nensa_admin'); ?></a></li>
   				<li><a href="#tabs-2"><?php _e('Load Results','nensa_admin'); ?></a></li>
-  				<li><a href="#tabs-3"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
+  				<li><a href="#tabs-3"><?php _e('Add Event','nensa_admin'); ?></a></li>
+          <li><a href="#tabs-4"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
         </ul>
           <div id="tabs-1">
           	<?php	 search_neon_for_racer(); ?>
           </div> <!-- End tab 1 -->
           <div id="tabs-2">
-          	<?php	import_results(); ?>
+          	</br><strong>Load 2016/2017 Event Data</strong></br>
+						</br>
+
+						<form id="import" name="import" method="post" enctype="multipart/form-data">
+							<table class="form-table"> 
+					      <tr valign="top"><th scope="row"><?php _e('Select Season:','nensa_admin'); ?></th>
+					        <td>
+								    <select id="event_select" name="event_select" value="">
+								        <option name="" value=""></option>
+								        
+								        <?php  // Get all db table names
+								        $sql = "SELECT  event_name  FROM RACE_EVENT WHERE season=2017 AND parent_event_id<>0;";
+								        $results = $wpdb1->get_results($sql);
+								        $repop_table = isset($_POST['event_select']) ? $_POST['event_select'] : null;
+								        
+								        foreach($results as $index => $value) {
+								            foreach($value as $eventName) {
+								                ?><option name="<?php echo $eventName ?>" value="<?php echo $eventName ?>" <?php if($repop_table === $eventName) { echo 'selected="selected"'; } ?>><?php echo $eventName ?></option><?php
+								            }
+								        }
+								        ?>
+								    </select>
+								  </td>
+								</tr>
+								 <tr valign="top"><th scope="row"><?php _e('Select CSV File:','nensa_admin'); ?></th>
+								  <td>
+								  	<input id="results_file" type="file" name="file" />
+								  </td>
+								</tr>
+							</table>
+							<p class="submit">
+						    <input id="import_button" type="submit" name="submit" class="button-primary" value="<?php _e('Import Event', 'nensa_admin') ?>" />
+						  </p>
+					  </form>
           </div> <!-- End tab 2 -->
           <div id="tabs-3">
-        
+        		<?php	 create_event(); ?>
           </div> <!-- End tab 3 -->
+          <div id="tabs-4">
+        
+          </div> <!-- End tab 4 -->
       </div> <!-- End #tabs -->
     </div> <!-- End page wrap -->
     

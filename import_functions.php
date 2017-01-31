@@ -5,48 +5,21 @@
  * @package llorix-one-lite
  */
 
-function import_results() {
+add_action( 'wp_ajax_jn_select', 'jn_select_callback' );
+function jn_select_callback() {
+	global $wpdb;
+	$season = intval( $_POST['season'] );
+  echo $season;
+	wp_die();
+}
 
-global $wpdb1;
-?>
-	</br><strong>Load 2016/2017 Event Data</strong></br>
-	</br>
+add_action('wp_ajax_import_results', 'import_results_callback');
+function import_results_callback() {
 
-	<form id="import" name="import" method="post" enctype="multipart/form-data">
-		<table class="form-table"> 
-      <tr valign="top"><th scope="row"><?php _e('Select Season:','nensa_admin'); ?></th>
-        <td>
-			    <select id="event_select" name="event_select" value="">
-			        <option name="" value=""></option>
-			        
-			        <?php  // Get all db table names
-			        global $wpdb1;
-			        $sql = "SELECT  event_name  FROM RACE_EVENT WHERE season=2017 AND parent_event_id<>0;";
-			        $results = $wpdb1->get_results($sql);
-			        $repop_table = isset($_POST['event_select']) ? $_POST['event_select'] : null;
-			        
-			        foreach($results as $index => $value) {
-			            foreach($value as $eventName) {
-			                ?><option name="<?php echo $eventName ?>" value="<?php echo $eventName ?>" <?php if($repop_table === $eventName) { echo 'selected="selected"'; } ?>><?php echo $eventName ?></option><?php
-			            }
-			        }
-			        ?>
-			    </select>
-			  </td>
-			</tr>
-			 <tr valign="top"><th scope="row"><?php _e('Select CSV File:','nensa_admin'); ?></th>
-			  <td>
-			  	<input type="file" name="file" />
-			  </td>
-			</tr>
-		</table>
-		<p class="submit">
-	    <input type="submit" name="submit" class="button-primary" value="<?php _e('Import Event', 'nensa_admin') ?>" />
-	  </p>
-  </form>
+	wp_enqueue_script( 'ajax-script', plugins_url( '/js/nensa_ajax.js', __FILE__ ), array('jquery') );
 
+	global $wpdb1;
 
-<?php
 	include ("connection.php");
   ini_set('auto_detect_line_endings', true);
 	if(isset($_POST["submit"]))
@@ -172,9 +145,12 @@ global $wpdb1;
 		  } 
 		}
 
-		echo "You have imported ". $c ." results. You skipped over ". $d ." duplicate records. There were ". $m ." member_season_id conflicts. There were ". $e ." errors.";
+		//echo "You have imported ". $c ." results. You skipped over ". $d ." duplicate records. There were ". $m ." member_season_id conflicts. There were ". $e ." errors.";
 
 	}
+
+	echo 'Hi';
+	die();
 }
 
 

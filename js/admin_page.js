@@ -77,9 +77,45 @@ jQuery(document).ready(function($) {
 		tb_remove();
 		blur_file_upload_field();  // Function to blur file upload field (gets column count from .csv file)
 	}
-	// *******  End WP Media Uploader ******* //
-	
-	
+
+
+	$('#something').click(function() {
+
+		event_select = $('#event_select').val();
+		firstName = $('#firstName').val();
+		lastName = $('#lastName').val();
+		email = $('#email').val();
+
+		var data = {
+			action: 'search_neon_for_racer',
+			accountId: accountId,
+			firstName: firstName,
+			lastName: lastName,
+			email: email
+		};
+		
+		// Run ajax request
+		$.post(ajaxurl, data, function(response) {
+
+		});
+
+	});
+
+/*
+	$('#import_button').click(function() {
+
+		var data = {
+			action: 'search_neon_for_racer'
+		};
+		
+		// Run ajax request
+		$.post(ajaxurl, data, function(response) {
+			test = 1;
+
+		});
+
+	});
+*/
 	
 	// ******* Begin 'Select Table' dropdown change function ******* //
 	$('#table_select').change(function() {  // Get column count and load table

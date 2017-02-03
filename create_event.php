@@ -140,42 +140,78 @@ function create_race() {
 
   include ("connection.php");
   ini_set('auto_detect_line_endings', true);
-  if(isset($_POST["submit"]))
+  if(isset($_POST["race_name"]) && isset($_POST["event_select"]))
   {
+    $race_name = $_POST["race_name"];
+    $event_name = $_POST["event_select"];
 
-    if(isset($_POST["season"])) {
-      $event_name = $_POST['event_select']; 
+    if (isset($_POST["race_date"])) {
+      $race_date = $_POST["race_date"];
     } else {
-      echo 'Select an event. ';
+      $race_date = '';
+    }
+
+    if (isset($_POST["race_distance"])) {
+      $race_distance = $_POST["race_distance"];
+    } else {
+      $race_distance = '';
+    }
+
+    if (isset($_POST["race_date"])) {
+      $race_date = $_POST["race_date"];
+    } else {
+      $race_date = '';
+    }
+
+    if (isset($_POST["race_technique"])) {
+      $race_technique = $_POST["race_technique"];
+    } else {
+      $race_technique = '';
+    }
+
+    if (isset($_POST["race_start_format"])) {
+      $race_start_format = $_POST["race_start_format"];
+    } else {
+      $race_start_format = '';
+    }
+
+    if (isset($_POST["race_age_groups"])) {
+      $race_age_groups = $_POST["race_age_groups"];
+    } else {
+      $race_age_groups = '';
+    }
+
+    if (isset($_POST["gender"])) {
+      $gender = $_POST["gender"];
+    } else {
+      $gender = '';
+    }
+
+    $result = $conn->query("SELECT event_id, season FROM RACE_EVENT WHERE event_name='$event_name'");
+      
+    if ($result->num_rows == 1) {
+      $row = $result->fetch_assoc();
+      $event_id = (int)$row['event_id'];
+      $season = (int)$row['season'];
+    } else {
+      echo 'Event Not Matched in Database. ';
       return;
     }
 
-    $result = $conn->query("SELECT * FROM RACE_EVENT WHERE season='$season' AND event_name='$event_name'");
-    $count = mysqli_num_rows($result);
-    if ($count > 0) { 
-      $d += 1;
-      echo 'Race already exists. ';
-      return; 
-    }
-
-    $e = 0;
     $sql = null;
    
-    $sql = mysqli_query($conn, "INSERT INTO RACE_EVENT () VALUES ()");
+    $sql = mysqli_query($conn, "INSERT INTO RACE_EVENT (parent_event_id, season, event_name, sex, event_date, age_group, technique, distance, start_format ) VALUES ('$event_id', '$season','$race_name','$gender','$race_date', '$race_age_groups', '$race_technique', '$race_distance', '$race_start_format')");
       
     if ($sql == 0) {
       $text = $conn->error;
-      $e += 1;
+      echo "There was an error adding the event.";
     } else {
-      $c += 1;
+      echo "Your event was successfully added.";
     }
 
-    //echo "You have imported ". $c ." results. You skipped over ". $d ." duplicate records. There were ". $m ." member_season_id conflicts. There were ". $e ." errors.";
-
+  } else {
+    echo 'Select season and event name. ';
   }
-
-  //echo 'Hi';
-  //die();
 
 ?>
   <h1>Add Race</h1>
@@ -201,14 +237,19 @@ function create_race() {
           </select>
         </td>
       </tr>
+      <tr valign="top"><th scope="row"><?php _e('Enter Race Name:','nensa_admin'); ?></th>
+        <td>
+          <input name="race_name" id="race_name" type="text">
+        </td>
+      </tr>
       <tr valign="top"><th scope="row"><?php _e('Select Date:','nensa_admin'); ?></th>
         <td>
-          <input type="date" id="event_date" name="event_date" max="2020-12-31"><br>
+          <input type="date" id="race_date" name="race_date" max="2020-12-31"><br>
         </td>
       </tr>
       <tr valign="top"><th scope="row"><?php _e('Select Distance:','nensa_admin'); ?></th>
         <td>
-          <select name="event_distance" id="event_distance" value="5K">
+          <select name="race_distance" id="race_distance" value="1.3K">
             <option value="1.3K">1.3K</option>
             <option value="1.5K">1.5K</option>
             <option value="5K">5K</option>
@@ -224,25 +265,15 @@ function create_race() {
       </tr>
       <tr valign="top"><th scope="row"><?php _e('Select Technique:','nensa_admin'); ?></th>
         <td>
-          <select name="event_technique" id="event_technique" value="Skate">
+          <select name="race_technique" id="race_technique" value="Skate">
             <option value="Skate">Skate</option>
             <option value="Classic">Classic</option>
           </select>
         </td>
       </tr>
-      <tr valign="top"><th scope="row"><?php _e('Select Format:','nensa_admin'); ?></th>
+      <tr valign="top"><th scope="row"><?php _e('Select Start Format:','nensa_admin'); ?></th>
         <td>
-          <select name="event_format" id="event_format" value="Sprint">
-            <option value="Sprint">Sprint</option>
-            <option value="Distance">Distance</option>
-            <option value="Pursue">Pursue</option>
-            <option value="Skiathlon">Skiathlon</option>
-          </select>
-        </td>
-      </tr>
-      <tr valign="top"><th scope="row"><?php _e('Select Start Type:','nensa_admin'); ?></th>
-        <td>
-          <select name="start_type" id="start_type" value="Interval">
+          <select name="race_start_format" id="race_start_format" value="Interval">
             <option value="Interval">Interval</option>
             <option value="Mass Start">Mass Start</option>
             <option value="Wave">Wave</option>
@@ -257,47 +288,9 @@ function create_race() {
           </select>
         </td>
       </tr> 
-      <tr valign="top"><th scope="row"><?php _e('Enter Techical Delegate:','nensa_admin'); ?></th>
-        <td>
-          <input name="event_distance" id="event_distance" type="text">
-        </td>
-      </tr> 
       <tr valign="top"><th scope="row"><?php _e('Enter Age Group(s):','nensa_admin'); ?></th>
         <td>
-          <input name="event_distance" id="event_age_groups" type="text">
-        </td>
-      </tr> 
-      <tr valign="top"><th scope="row"><?php _e('Enter Event Temp:','nensa_admin'); ?></th>
-        <td>
-          <input type="number" id="event_temp" name="event_temp" min="-20" max="50">
-        </td>
-      </tr>
-      <tr valign="top"><th scope="row"><?php _e('Enter Snow Conditions:','nensa_admin'); ?></th>
-        <td>
-          <select name="snow_conditions" id="snow_conditions" value="New Snow">
-            <option value="None">New Snow</option>
-            <option value="Old Snow">Old Snow</option>
-            <option value="Manmade">Manmade</option>
-            <option value="Feels Like Styrofoam">Feels Like Styrofoam</option>
-            <option value="Dust On Crust">Dust On Crust</option>
-            <option value="Really Shite">Really Shite</option>
-            <option value="Rocks Everywhere">Rocks Everywhere</option>
-            <option value="Slush">Slush</option>
-            <option value="Pine Needles">Pine Needles</option>
-            <option value="Black Ice">Black Ice</option>
-            <option value="Mash Potato">Mash Potato</option>
-            <option value="Bulletproof Crust">Bulletproof Crust</option>
-          </select>
-        </td>
-      </tr> 
-      <tr valign="top"><th scope="row"><?php _e('Select Results Type:','nensa_admin'); ?></th>
-        <td>
-          <select name="results_type" id="results_type" value="USSA Scored">
-            <option value="USSA Scored">USSA Scored</option>
-            <option value="Zak Cup">Zak Cup</option>
-            <option value="Marathon">Marathon</option>
-            <option value="Club">Club</option>
-          </select>
+          <input name="race_age_groups" id="race_age_groups" type="text">
         </td>
       </tr>                                              
     </table>

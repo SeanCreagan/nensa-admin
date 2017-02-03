@@ -1,0 +1,48 @@
+      <tr valign="top"><th scope="row"><?php _e('Enter Event Temp:','nensa_admin'); ?></th>
+        <td>
+          <input type="number" id="race_temp" name="race_temp" min="-20" max="50">
+        </td>
+      </tr>
+      <tr valign="top"><th scope="row"><?php _e('Enter Snow Conditions:','nensa_admin'); ?></th>
+        <td>
+          <select name="snow_conditions" id="snow_conditions" value="New Snow">
+            <option value="None">New Snow</option>
+            <option value="Old Snow">Old Snow</option>
+            <option value="Manmade">Manmade</option>
+            <option value="Feels Like Styrofoam">Feels Like Styrofoam</option>
+            <option value="Dust On Crust">Dust On Crust</option>
+            <option value="Really Shite">Really Shite</option>
+            <option value="Rocks Everywhere">Rocks Everywhere</option>
+            <option value="Slush">Slush</option>
+            <option value="Pine Needles">Pine Needles</option>
+            <option value="Black Ice">Black Ice</option>
+            <option value="Mash Potato">Mash Potato</option>
+            <option value="Bulletproof Crust">Bulletproof Crust</option>
+          </select>
+        </td>
+      </tr> 
+      <tr valign="top"><th scope="row"><?php _e('Select Results Type:','nensa_admin'); ?></th>
+        <td>
+          <select name="race_results_type" id="race_results_type" value="USSA Scored">
+            <option value="USSA Scored">USSA Scored</option>
+            <option value="Zak Cup">Zak Cup</option>
+            <option value="Marathon">Marathon</option>
+            <option value="Club">Club</option>
+          </select>
+        </td>
+      </tr> 
+      <tr valign="top"><th scope="row"><?php _e('Select Format:','nensa_admin'); ?></th>
+        <td>
+          <select name="race_format" id="race_format" value="Sprint">
+            <option value="Sprint">Sprint</option>
+            <option value="Distance">Distance</option>
+            <option value="Pursue">Pursue</option>
+            <option value="Skiathlon">Skiathlon</option>
+          </select>
+        </td>
+      </tr>
+      <tr valign="top"><th scope="row"><?php _e('Enter Techical Delegate:','nensa_admin'); ?></th>
+        <td>
+          <input name="race_distance" id="race_distance" type="text">
+        </td>
+      </tr> 

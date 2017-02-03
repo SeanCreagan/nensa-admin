@@ -174,7 +174,8 @@ class nensa_admin {
   				<li><a href="#tabs-1"><?php _e('Member Lookup','nensa_admin'); ?></a></li>
   				<li><a href="#tabs-2"><?php _e('Load Results','nensa_admin'); ?></a></li>
   				<li><a href="#tabs-3"><?php _e('Add Event','nensa_admin'); ?></a></li>
-          <li><a href="#tabs-4"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
+  				<li><a href="#tabs-4"><?php _e('Add Race','nensa_admin'); ?></a></li>
+          <li><a href="#tabs-5"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
         </ul>
           <div id="tabs-1">
           	<?php	 search_neon_for_racer(); ?>
@@ -219,6 +220,9 @@ class nensa_admin {
         		<?php	 create_event(); ?>
           </div> <!-- End tab 3 -->
           <div id="tabs-4">
+        		<?php	 create_race(); ?>
+          </div> <!-- End tab 4 -->
+          <div id="tabs-5">
         
           </div> <!-- End tab 4 -->
       </div> <!-- End #tabs -->

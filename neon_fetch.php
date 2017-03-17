@@ -60,22 +60,36 @@ function search_neon_for_racer() {
         ),
     );
 
-    $go = array( 
-        'method' => 'account/retrieveIndividualAccount', 
-        'parameters' => array(
-            'accountId'=>$searchCriteria['accountID']
+    $search1 = array( 
+        'method' => 'membership/listMemberships', 
+        'columns' => array(
+            'standardFields' => array('Account ID', 'Full Name (F)', 'Company Name', 'DOB Month', 'DOB Year', 'State', 'Membership Name', 'Membership Cost','Membership Expiration Date', 'Membership Start Date', 'Membership Enrollment Date' ),
+            'customFields' => array(136,171),
+        ),
+        'page' => array(
+            'currentPage' => 1,
+            'pageSize' => 200,
+            'sortColumn' => 'Account ID',
+            'sortDirection' => 'DESC',
         ),
     );
 
-    $go1 = array( 
-        'method' => 'account/retrieveIndividualAccount', 
-        'parameters' => array(
-            'accountId'=>40827
+    // Stanard API call "go" with example on how to fetch numbers for customer
+    // field mapping.  Swap "Membership"  with "Account"
+    $go2 = array( 
+      'method' => 'common/listCustomFields', 
+      'parameters' => array(
+        'searchCriteria.component' => 'Account',
         ),
-    );
+      );
 
+    // Use the following single line for complete list of accounts
+    // Be sure to comment out search array setup 3 lines down
     //$search['criteria'][] = array( 'Account ID', 'NOT_BLANK', '');
+    $search1['criteria'][] = array( 'Last Name', 'NOT_BLANK', '');
+    
     /* Some search criteria are variable based on our POST data. Add them to the query if applicable */
+    
     if ( isset( $searchCriteria['accountID'] ) && !empty( $searchCriteria['accountID'] ) ) {
         $search['criteria'][] = array( 'Account ID', 'EQUAL', $searchCriteria['accountID'] );
     }
@@ -83,20 +97,19 @@ function search_neon_for_racer() {
         $search['criteria'][] = array( 'First Name', 'EQUAL', $searchCriteria['firstName'] );
         $search['criteria'][] = array( 'Last Name', 'EQUAL', $searchCriteria['lastName'] );
     }
+    
 
     /**
      * Execute search
      **************************************************/ 
 
     /* If there are search criteria present, execute the search query */
-    if ( !empty( $search['criteria'] ) ) {
-        $result = $neon->search($search);
-        $result_1 = $neon->go($go1);
-        $message = 'No results match your search.';
-    } else {
-        $result = null;
-        $message = 'You must specify search criteria.';
-    }
+
+    $result = $neon->search($search1);
+    $result_1 = $neon->go($go2);
+
+    $message = 'Last Date Processed:' . date(DATE_RFC2822);
+    
 
     /* Logout - terminate API session with the server */
     $neon->go( array( 'method' => 'common/logout' ) );
@@ -110,33 +123,13 @@ function search_neon_for_racer() {
 
 
 
-  <h1>NENSA Member Lookup</h1>
+  <h1>NENSA Member Season Update From NEON</h1>
   </br>
-  <form action=# method="POST" style="background-color: GAINSBORO;">
-    <table class="form-table"> 
-      <tr >
-        <th style="padding-left: 12px;">NENSA ID</th>
-        <th></th>
-        <th style="padding-left: 12px;">Last Name</th>
-        <th style="padding-left: 12px;">First Name</th>
-      </tr>
-      <tr valign="top">
-        <td width="5%">
-          <input type="text" name="accountID" value="<?php echo htmlentities( $searchCriteria['accountID'] ); ?>"/>
-        </td>
-        <td width="5%">OR</td>
-        <td width="5%">
-          <input type="text" name="lastName" value="<?php echo htmlentities( $searchCriteria['lastName'] ); ?>" />
-        <td width="5%">
-          <input type="text" name="firstName" value="<?php echo htmlentities( $searchCriteria['firstName'] ); ?>" />
-        </td><td></td>
-      </tr>
-    </table>
-      <p class="submit" style="padding-left: 12px;">
-        <input type="submit" class="button-primary" value="<?php _e('Submit', 'nensa_admin') ?>" /></br>
-      </p>
+  <form action=# method="POST" >
+    <input type="submit" class="button-primary" value="<?php _e('Load Member Season Table', 'nensa_admin') ?>" /></br>
   </form>
   </br>
+  <p><?php echo 'Date Last Loaded: ' . date(DATE_RFC2822); ?></p>
   <hr>
 
   <?php
@@ -145,40 +138,16 @@ function search_neon_for_racer() {
    *******************************************/
   ?>
   <?php if( isset($result['page']['totalResults'] ) && $result['page']['totalResults'] >= 1 ): ?>
-  <table class="table table-striped" style="border-style: solid; border-width: 1px; background-color: white;">
-      <thead>
-          <tr>
-              <th align="left">NENSA #</th>
-              <th align="left">USSA #</th>
-              <th align="left">Age Group</th>
-              <th align="left">Name</th>
-              <th align="left">Email</th>
-              <th align="left">Gender</th>
-              <th align="left">Location</th>
-          </tr>
-      </thead>
-      <tbody style="background-color: GAINSBORO;">
-        <?php if (array_key_exists('searchResults', $result)) { ?>
-          <?php foreach($result['searchResults'] as $r): ?>
-          <tr >
-              <td width="15%"><?php echo $r['Account ID']; ?>
-              <td width="15%"><?php echo $r['USSA Number']; ?> 
-              <td width="15%"><?php echo $r['2017 Age Group']; ?>
-              <td width="15%"><?php echo $r['First Name']; ?> <?php echo $r['Last Name']; ?></td>
-              <td width="15%"><?php echo $r['Email 1']; ?></td>
-              <td width="15%"><?php echo $r['Gender']; ?></td>
-              <td width="15%"><?php echo $r['City']; ?> <?php echo $r['State']; ?></td>
-          </tr>
-          <?php endforeach; ?>
-          <?php } ?>
-      </tbody>
-  </table>
-  </br><?php print_r(array_keys($r)); ?></br>
-  </br><?php print_r($result_1); ?></br>
-  </br><?php print_r(array_keys($result_1['individualAccount'])); ?></br>
-  </br><?php print_r($result_1['individualAccount']['lastModifiedDateTime']); ?></br>
-  </br><?php print_r($result_1['individualAccount']['accountId']); ?></br>
-  </br><?php print_r(array_keys($result_1['individualAccount']['primaryContact'])); ?></br>
+    </br><?php print ($result['page']['totalResults']); ?></br>
+    </br><?php print_r(array_keys($result['searchResults'][0])); ?></br>
+  </br><?php print_r($result['searchResults'][0]['Membership Expiration Date']); ?></br>
+    </br><?php print(sizeof($result['searchResults'])); ?></br>
+    </br><?php print_r($result_1); ?></br>
+    </br><?php print_r(array_keys($result_1)); ?></br>
+    </br><?php //print_r(array_keys($result_1['individualAccount'])); ?></br>
+    </br><?php //print_r($result_1['individualAccount']['lastModifiedDateTime']); ?></br>
+    </br><?php //print_r($result_1['individualAccount']['accountId']); ?></br>
+    </br><?php //print_r(array_keys($result_1['individualAccount']['primaryContact'])); ?></br>
   <?php else: ?>
       <p><?php echo $message; ?></p>
   <?php endif; ?>

@@ -178,7 +178,7 @@ class nensa_admin {
           <li><a href="#tabs-5"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
         </ul>
           <div id="tabs-1">
-          	<?php	 search_neon_for_racer(); ?>
+          	<?php	 fetch_member_season_data(); ?>
           </div> <!-- End tab 1 -->
           <div id="tabs-2">
           	</br><strong>Load 2016/2017 Event Data</strong></br>

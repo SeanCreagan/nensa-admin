@@ -1,10 +1,12 @@
 <?php 
 
+// Counts
+
 function load_member_skier ($membership_row) {
   include ("connection.php");
 
   if ($membership_row["USSA Number"] == 0 || empty($membership_row["USSA Number"])) {
-    return false;
+    return 0;
   }
  
   $first = $membership_row['First Name']; 
@@ -36,18 +38,20 @@ function load_member_skier ($membership_row) {
   $result = $conn->query("SELECT * FROM MEMBER_SKIER WHERE nensa_num='$nensa_num'");
   $num_rows = mysqli_num_rows($result);
   if ($num_rows > 0) {
+    $return = 1;
     $sql = mysqli_query($conn, "UPDATE MEMBER_SKIER SET ussa_num='$ussa_num',first='$first',last='$last',sex='$gender',city='city',state='$state',country='$country',birthdate='$birthdate',birth_year='$birth_year' WHERE nensa_num='$nensa_num'");
   } else {
+    $return = 2;
     $sql = mysqli_query($conn, "INSERT INTO MEMBER_SKIER (nensa_num, ussa_num, first, last, sex, city, state, country, birthdate, birth_year) VALUES ('$nensa_num', '$ussa_num', '$first', '$last','$gender', '$city', '$state', '$country','$birthdate','$birth_year')");
   }
 
   //  The most likely failure is a duplicate entry with ussa_num
   if ($sql == 0) {
-    print ($conn->error);
-    return false;
+    write_log($conn->error);
+    return 0;
   }
 
-  return true;
+  return $return;
 }
 
 function fetch_member_skier_data() {
@@ -114,16 +118,30 @@ function fetch_member_skier_data() {
     // Use the following single line for complete list of accounts
     if(isset($_POST["searchCriteria"])) {
       $search['criteria'][] = array( 'Account ID', 'NOT_BLANK', '');
+
+      // While the form variable "reload" is set to true when checked, the valuation below
+      // can be done as binary.  When not checked, it is not set so continue with the 
+      // fetch by changes after the last pull
+      if(!isset($_POST["reload"]) && isset($member_skier_date) && $member_skier_date != 'Never Processed') {
+        $search['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $member_skier_date);
+      }
+
     }
 
     /**
      * Execute search
-     **************************************************/
+     **************************************************
+     * If you need a reference pull to look at account structure, the follow is it
+     * Use the php command print_r and print_r w/ array_keys to view
+     * $result_go = $neon->go( array( 'method' => 'account/retrieveIndividualAccount', 'parameters' => array('accountId'=>29607)));
+     */
     
     if ( !empty( $search['criteria'] ) ) {
       $load_count = 0; 
+      $update_count = 0;
+      $new_count = 0;
       $result = $neon->search($search);
-      $message = 'Did the search';
+      $message = 'No results were pulled from NEON';
       // Do one fetch as a sanity check.  Yes it's n+1 fetches. 
       if( isset($result['page']['totalResults'] ) && $result['page']['totalResults'] >= 1 ) {
         for ($currentPage = 1; $currentPage < $result['page']['totalPage']; $currentPage++) {
@@ -133,13 +151,18 @@ function fetch_member_skier_data() {
 
           // Another for loop - so shoot me
           // We're using 200 per page. Not sure what is really optimal.
-          for ($i = 0; $i < 20; $i++) {
+          for ($i = 0; $i < 200; $i++) {
             // I'm sure there is a simpler way to not fall off the last page
             // but this works and it's PHP - who really cares anyway
             if (isset($result['searchResults'][$i])) {
               $load = load_member_skier($result['searchResults'][$i]);
-              if ($load == true) {
+              if ($load > 0) {
                 $load_count++;
+              }
+              if ($load == 1) {
+                $update_count += 1;
+              } else if ($load == 2) {
+                $new_count += 1;
               }
             }
           }
@@ -168,7 +191,8 @@ function fetch_member_skier_data() {
   </br>
   <form action=# method="POST" >
     <input type="hidden" name="searchCriteria" value=true/>
-    <input type="submit" class="button-primary" value="<?php _e('Load Member Season Table', 'nensa_admin') ?>" /></br>
+    <input type="checkbox" name="reload" value=true> Reload All Members</br></br>
+    <input type="submit" class="button-primary" value="<?php _e('Load Member Skier Table', 'nensa_admin') ?>" /></br>
   </form>
   </br>
   <p><?php echo 'Date Last Loaded: ' . $member_skier_date; ?></p>
@@ -180,7 +204,8 @@ function fetch_member_skier_data() {
    *******************************************/
   ?>
   <?php if( isset($result['page']['totalResults'] ) && $result['page']['totalResults'] >= 1 ): ?>
-    </br><?php print ($load_count." members were either updated or added into the member_season table"); ?></br>
+    </br><?php print ($load_count." members were processed for the member_skier table, ");
+               print ($update_count." members were updated and ".$new_count." members were added.");?></br>
   <?php else: ?>
       <p><?php echo $message; ?></p>
   <?php endif; ?>
@@ -191,8 +216,9 @@ function fetch_member_skier_data() {
 function load_member_season ($membership_row) {
   include ("connection.php");
 
+  // May 31st expiration
   if ($membership_row['Membership Expiration Date'] < date("Y-m-d")) {
-    return false;
+    return 0;
   }
    
   $dob_year = $membership_row['DOB Year'];
@@ -231,25 +257,27 @@ function load_member_season ($membership_row) {
       $member_id = (int)$row['member_id'];
     }
   } else {
-    return false;
+    return 0;
   }
 
   $result = $conn->query("SELECT * FROM MEMBER_SEASON WHERE nensa_num='$nensa_num'");
   $num_rows = mysqli_num_rows($result);
   if ($num_rows > 0) {
+    $return = 1;
     $sql = mysqli_query($conn, "UPDATE MEMBER_SEASON SET season='$season', member_status='$member_status', member_level='$member_level', age_group='$age_group', age_season='$age_season', club_name='$club_name' WHERE nensa_num='$nensa_num'");
   } else {
+    $return = 2;
     $sql = mysqli_query($conn, "INSERT INTO MEMBER_SEASON (member_id, nensa_num, season, member_status, member_level, age_group, age_season, club_name) VALUES ('$member_id','$nensa_num', '$season', '$member_status', '$member_level','$age_group', '$age_season', '$club_name')");
   }
 
 
   //  The most likely failure is a duplicate entry with ussa_num
   if ($sql == 0) {
-    print ($conn->error);
-    return false;
+    write_log($conn->error);
+    return 0;
   }
 
-  return true;
+  return $return;
 }
 
 function fetch_member_season_data() {
@@ -323,6 +351,10 @@ function fetch_member_season_data() {
     // Use the following single line for complete list of accounts
     if(isset($_POST["searchCriteria"])) {
       $search['criteria'][] = array( 'Account ID', 'NOT_BLANK', '');
+
+      if(!isset($_POST["reload"]) && isset($member_season_date) && $member_season_date != 'Never Processed') {
+        $search['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $member_season_date);
+      }
     }
 
     /**
@@ -352,8 +384,13 @@ function fetch_member_season_data() {
             // but this works and it's PHP - who really cares anyway
             if (isset($result['searchResults'][$i])) {
               $load = load_member_season($result['searchResults'][$i]);
-              if ($load == true) {
+              if ($load > 0) {
                 $load_count++;
+              }
+              if ($load == 1) {
+                $update_count += 1;
+              } else if ($load == 2) {
+                $new_count += 1;
               }
             }
           }
@@ -379,6 +416,7 @@ function fetch_member_season_data() {
   </br>
   <form action=# method="POST" >
     <input type="hidden" name="searchCriteria" value=true/>
+    <input type="checkbox" name="reload" value=true> Reload All Members</br></br>
     <input type="submit" class="button-primary" value="<?php _e('Load Member Season Table', 'nensa_admin') ?>" /></br>
   </form>
   </br>
@@ -391,7 +429,8 @@ function fetch_member_season_data() {
    *******************************************/
   ?>
   <?php if( isset($result['page']['totalResults'] ) && $result['page']['totalResults'] >= 1 ): ?>
-    </br><?php print ($load_count." members were either updated or added into the member_season table"); ?></br>
+    </br><?php print ($load_count." members were processed for the member_season table, ");
+               print ($update_count." members were updated and ".$new_count." members were added.");?></br>
   <?php else: ?>
     <p><?php echo $message; ?></p>
   <?php endif; ?>

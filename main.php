@@ -60,6 +60,21 @@ class nensa_admin {
 			add_action( 'admin_init', array( $this, 'nensa_admin_settings' ) ); // Create settings
 			register_activation_hook( __FILE__ , array($this, 'nensa_admin_activate')); // Add settings on plugin activation
 		}
+
+		// Set up logging using the WP_DEBUG feature - must be enabled
+		// http://www.stumiller.me/sending-output-to-the-wordpress-debug-log/
+		if (!function_exists('write_log')) {
+		  function write_log ( $log )  {
+		    if ( true === WP_DEBUG ) {
+		      if ( is_array( $log ) || is_object( $log ) ) {
+		        error_log( print_r( $log, true ) );
+		      } else {
+		        error_log( $log );
+		      }
+		    }
+		  }
+		}
+
 	}
 	
   public function nensa_admin_plugins_loaded(){
@@ -178,7 +193,7 @@ class nensa_admin {
           <li><a href="#tabs-5"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
         </ul>
           <div id="tabs-1">
-          	<?php	 fetch_member_season_data(); ?>
+          	<?php	 fetch_member_data(); //search_neon_for_racer();?>
           </div> <!-- End tab 1 -->
           <div id="tabs-2">
           	</br><strong>Load 2016/2017 Event Data</strong></br>

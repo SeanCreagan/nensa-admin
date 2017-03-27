@@ -238,7 +238,14 @@ class nensa_admin {
         		<?php	 create_race(); ?>
           </div> <!-- End tab 4 -->
           <div id="tabs-5">
-        
+            <ul>
+                <li>This plugin also contains shortcode wrappers that allow one to embedded wpDataTables in any page.</li>
+                <li>There are two shortcodes wrappers available.  One for the results based tables and another for the JN rankings.</li>
+                <li>The results datatable is invoked by embedding [nensa_event_results  datatables_id=n] in the page content (visual or text) editor.</li>
+                <li>The rankings datatable is invoked by embedding [nensa_jn_ranking  datatables_id=n] in the page content (visual or text) editor.</li>
+                <li>Creating a shortcode wrappers is very easy - see load_tables.php for examples.  Seven lines of code plus any processing function.</li>
+                <li>The shortcode wrappers and underlying functions are independent of any template code.</li>
+            </ul>
           </div> <!-- End tab 4 -->
       </div> <!-- End #tabs -->
     </div> <!-- End page wrap -->

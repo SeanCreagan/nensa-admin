@@ -4,10 +4,22 @@
 function load_member_season ($membership_row) {
   include ("connection.php");
 
-  // May 31st expiration
-  if ($membership_row['Membership Expiration Date'] < date("Y-m-d")) {
+  $now = time();
+  $may_31 = strtotime("31st May");
+
+  if ($now > $may_31)
+      $exp_date = date("Y-m-d", strtotime('+1 year', $may_31));
+  else 
+      $exp_date = date("Y-m-d", $may_31);
+
+  // Expiration date is always on May 31st
+  if (strpos($membership_row['Membership Name'], 'LIFE') !== false) {
+    // Above is a standard pattern for string search - I'm not going to 
+    // mess with the logic to get a negation here.  
+    // Just skip the expiration check - easy enough. Have a nice day!
+  } else if ($membership_row['Membership Expiration Date'] != $exp_date) {
     return 0;
-  }
+  } 
    
   $dob_year = $membership_row['DOB Year'];
 
@@ -26,7 +38,8 @@ function load_member_season ($membership_row) {
   $nensa_num = (int)$membership_row['Account ID'];
   $member_level =  $membership_row['Membership Name']; 
 
-  if (date("m") > 7) {
+  # In June
+  if (date("m") > 5) {
     $season = date("Y")+1;
   } else {
     $season = date("Y");
@@ -71,9 +84,7 @@ function load_member_season ($membership_row) {
 function load_member_skier ($membership_row) {
   include ("connection.php");
 
-  if ($membership_row["USSA Number"] == 0 || empty($membership_row["USSA Number"])) {
-    return 0;
-  }
+  // Add to SQL statement NULLIF('$ussa_num',0) and remove
  
   $first = $membership_row['First Name']; 
   $last = $membership_row['Last Name']; 
@@ -86,6 +97,10 @@ function load_member_skier ($membership_row) {
   $country = $membership_row['Country'];
   $ussa_num = (int)$membership_row["USSA Number"];
   $nensa_num = (int)$membership_row['Account ID'];
+
+  if ($ussa_num == '' || !isset($ussa_num)) {
+    $ussa_num = 0;
+  }
 
   if (strlen($dob_day) == 1) {
     $dob_day = '0'.$dob_day;
@@ -105,10 +120,10 @@ function load_member_skier ($membership_row) {
   $num_rows = mysqli_num_rows($result);
   if ($num_rows > 0) {
     $return = 1;
-    $sql = mysqli_query($conn, "UPDATE MEMBER_SKIER SET ussa_num='$ussa_num',first='$first',last='$last',sex='$gender',city='city',state='$state',country='$country',birthdate='$birthdate',birth_year='$birth_year' WHERE nensa_num='$nensa_num'");
+    $sql = mysqli_query($conn, "UPDATE MEMBER_SKIER SET ussa_num=NULLIF('$ussa_num',0),first='$first',last='$last',sex='$gender',city='city',state='$state',country='$country',birthdate='$birthdate',birth_year='$birth_year' WHERE nensa_num='$nensa_num'");
   } else {
     $return = 2;
-    $sql = mysqli_query($conn, "INSERT INTO MEMBER_SKIER (nensa_num, ussa_num, first, last, sex, city, state, country, birthdate, birth_year) VALUES ('$nensa_num', '$ussa_num', '$first', '$last','$gender', '$city', '$state', '$country','$birthdate','$birth_year')");
+    $sql = mysqli_query($conn, "INSERT INTO MEMBER_SKIER (nensa_num, ussa_num, first, last, sex, city, state, country, birthdate, birth_year) VALUES ('$nensa_num', NULLIF('$ussa_num',0), '$first', '$last','$gender', '$city', '$state', '$country','$birthdate','$birth_year')");
   }
 
   //  The most likely failure is a duplicate entry with ussa_num
@@ -158,7 +173,7 @@ function fetch_member_data() {
 
     /**
      * Search Query 
-     * Customer fields use ID.  136 = Age Group, 171 = Age at end of season
+     * Customer fields use ID.  108 = USSA ID, 136 = Age Group, 171 = Age at end of season
      * Use "go2" search to fetch list of custom field (uncomment)
      *************************************************/
     $search_skier = array( 

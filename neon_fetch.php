@@ -135,6 +135,7 @@ function load_member_skier ($membership_row) {
   return $return;
 }
 
+add_action('wp_ajax_fetch_member_data','fetch_member_data');
 function fetch_member_data() {
 
   /* Include the NeonCRM PHP Library */
@@ -216,19 +217,19 @@ function fetch_member_data() {
     */
 
     // Use the following single line for complete list of accounts
-    if(isset($_POST["searchCriteria"])) {
+    if(isset($_POST["action"]) && $_POST["action"] == 'fetch_member_data') {
       $search_skier['criteria'][] = array( 'Account ID', 'NOT_BLANK', '');
 
       // While the form variable "reload" is set to true when checked, the valuation below
       // can be done as binary.  When not checked, it is not set so continue with the 
       // fetch by changes after the last pull
-      if(!isset($_POST["reload"]) && isset($member_skier_date) && $member_skier_date != 'Never Processed') {
+      if(isset($_POST["reload"]) && $_POST["reload"] == 'false' && isset($member_skier_date) && $member_skier_date != 'Never Processed') {
         $search_skier['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $member_skier_date);
       }
 
       $search_season['criteria'][] = array( 'Account ID', 'NOT_BLANK', '');
 
-      if(!isset($_POST["reload"]) && isset($member_season_date) && $member_season_date != 'Never Processed') {
+      if(isset($_POST["reload"]) && $_POST["reload"] == 'false' && isset($member_season_date) && $member_season_date != 'Never Processed') {
         $search_season['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $member_season_date);
       }
     }
@@ -331,35 +332,12 @@ function fetch_member_data() {
   // See NEON API/Developers PHP code example
   // $result_1 = $neon->go($go1);
   // $result_2 = $neon->go($go2);
-
-  ?>
-
-  <h1>NENSA Member Update From NEON</h1>
-  </br>
-  <form action=# method="POST" >
-    <input type="hidden" name="searchCriteria" value=true/>
-    <input type="checkbox" name="reload" value=true> Reload All Members</br></br>
-    <input type="submit" class="button-primary" value="<?php _e('Load Member Tables', 'nensa_admin') ?>" /></br>
-  </form>
-  </br>
-  <p><?php echo 'Date Last Loaded: ' . $member_skier_date; ?></p>
-  <hr>
-
-  <?php
-  /**
-   * Iterate through API results
-   *******************************************/
-  ?>
-  <?php if( (isset($result_skier['page']['totalResults'] ) && $result_skier['page']['totalResults'] >= 1) || (isset($result_season['page']['totalResults'] ) && $result_season['page']['totalResults'] >= 1) ): ?>
-    </br><?php print ($skier_load_count." members were processed for the member_skier table, ");
-               print ($skier_update_count." members were updated and ".$skier_new_count." members were added.");?></br>
-         <?php print ($season_load_count." members were processed for the member_season table, ");
-               print ($season_update_count." members were updated and ".$season_new_count." members were added.");?></br>
-  <?php else: ?>
-      <p><?php echo $skier_message; ?></p>
-  <?php endif; ?>
-
-<?php
+    
+  // Set response variable to be returned to jquery
+  $response = json_encode( array( 'skier_message' => $skier_message, 'date_of_last_load' => $member_skier_date, 'skier_load_count' => $skier_load_count, 'skier_update_count' => $skier_update_count, 'skier_new_count' => $skier_new_count, 'season_load_count' => $season_load_count, 'season_update_count' => $season_update_count, 'season_new_count' => $season_new_count) );
+  header( "Content-Type: application/json" );
+  echo $response;
+  wp_die();
 }
 
 

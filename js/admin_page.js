@@ -1,74 +1,8 @@
 jQuery(document).ready(function($) {
-				
-	// 
-	// Function for blur event on file upload field (used for input field AND upload button)
-	function blur_file_upload_field() {
-		
-		file_upload_url = $('#csv_file').val();
-		extension = file_upload_url.substr((file_upload_url.lastIndexOf('.') +1));
-		
-		// If the file upload does not contain a valid .csv file extension
-		if(extension !== 'csv') {
-			
-			// File extension .csv popup error
-			$( "#dialog_csv_file" ).dialog({
-			  modal: true,
-			  buttons: {
-				Ok: function() {
-				  $( this ).dialog( "close" );
-				}
-			  }
-			});
-			$('#return_csv_col_count').text('0');
-			return;
-		}
-		
-		// Setup ajax variable
-		var data = {
-			action: 'nensa_admin_get_csv_cols',
-			file_upload_url: file_upload_url
-		};
-		
-		// Run ajax request
-		$.post(ajaxurl, data, function(response) {
-			//alert(response.column_count);
-			$('#return_csv_col_count').text(response.column_count);
-			$('#num_cols_csv_file').val(response.column_count);
-		});
-	}
-	
 	//
 	// Initiate tabbed content
 	$(function() {  
 		$('#tabs').tabs();
-	});
-	
-	//
-	// Click "Table Preview" button each time page is loaded
-	$('#repop_table_ajax').trigger('click');
-	
-	//
-	// Disable 'disable auto-increment' button until needed
-	$('#remove_autoinc_column').prop('disabled', true); 
-	
-	//
-	// Click to hide error/success messages
-	$('.error_message, .success_message, .info_message_dismiss').click(function() {  
-		 $( this ).fadeOut( "slow", function() {
-		});
-	}); 
-	
-	//
-	// Set blur click function on file input field
-	$('#csv_file').blur(function() {
-		blur_file_upload_field();  // Function to blur file upload field (gets column count from .csv file)
-	});
-	
-	// *******  Begin WP Media Uploader ******* //
-	$('#csv_file_button').click(function() {  // Run WP media uploader
-		formfield = $('#csv_file').attr('name');
-		tb_show('', 'media-upload.php?type=image&amp;TB_iframe=true');
-		return false;
 	});
 	 
 	window.send_to_editor = function(html) {  // Send WP media uploader response
@@ -77,45 +11,6 @@ jQuery(document).ready(function($) {
 		tb_remove();
 		blur_file_upload_field();  // Function to blur file upload field (gets column count from .csv file)
 	}
-
-
-	$('#something').click(function() {
-
-		event_select = $('#event_select').val();
-		firstName = $('#firstName').val();
-		lastName = $('#lastName').val();
-		email = $('#email').val();
-
-		var data = {
-			action: 'search_neon_for_racer',
-			accountId: accountId,
-			firstName: firstName,
-			lastName: lastName,
-			email: email
-		};
-		
-		// Run ajax request
-		$.post(ajaxurl, data, function(response) {
-
-		});
-
-	});
-
-/*
-	$('#import_button').click(function() {
-
-		var data = {
-			action: 'search_neon_for_racer'
-		};
-		
-		// Run ajax request
-		$.post(ajaxurl, data, function(response) {
-			test = 1;
-
-		});
-
-	});
-*/
 	
 	// ******* Begin 'Select Table' dropdown change function ******* //
 	$('#table_select').change(function() {  // Get column count and load table
@@ -223,46 +118,37 @@ jQuery(document).ready(function($) {
 		});
 	});
 	// ******* End 'Reload Table Preview' button AND 'Disable auto-increment Column' checkbox click function ******* //
-	
-	//
-	// Delete DB Table button
-	
-	$('#dialog-confirm').dialog({
-		autoOpen: false,
-		width: 400,
-		modal: true,
-		resizable: false,
-		buttons: {
-			'Delete Table': function() {
-				$('#delete_db_button_hidden').val('true');
-				$(this).dialog('close');
-				$('#nensa_admin_form').submit();
-			},
-			'Cancel': function() {
-				$(this).dialog("close");
-			}
+	$('#neon_member_load').click(function() {  // Reload Table
+
+		// Begin ajax loading image
+		$('#date_of_last_load').html('<img src="'+nensa_admin_pass_js_vars.ajax_image+'" />');
+		$('#skier_load_counts').text('');
+		$('#season_load_counts').text('');
+
+
+		// Get value of disable auto-increment column checkbox
+		if($('#reload_all_from_neon').is(':checked')){
+			reload = 'true';
+		}else{
+			reload = 'false';
 		}
-	});
-	$('#delete_db_button').click(function(e) {
-		if($('#table_select').val() === '') {
+
+		// Setup ajax variable
+		var data = {
+			action: 'fetch_member_data',
+			reload: reload
+		};
+
+		// Run ajax request
+		$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
 			
-			// DB table not selected popup error
-			$( '#dialog_select_db' ).dialog({
-			  modal: true,
-			  width: 400,
-			  buttons: {
-				Ok: function() {
-				  $( this ).dialog( 'close' );
-				}
-			  }
-			});
-			
-			// Reset .csv column count
-			$('#return_csv_col_count').text('0');
-			return;
-		}
-		else {
-			$('#dialog-confirm').dialog('open');
-		}
+			// Populate Table Preview HTML from response
+			$('#date_of_last_load').text('Date last loaded: '+response.date_of_last_load);
+			$('#skier_load_counts').text(response.skier_load_count+" NEON skiers were processed for the member_skier table, "+response.skier_update_count+" skiers were updated and "+response.skier_new_count+" skiers were added.");
+			$('#season_load_counts').text(response.season_load_count+" NEON skiers were processed for the member_season table, "+response.season_update_count+" skiers were updated and "+response.season_new_count+" skiers were added.");
+
+		});
+
 	});
+
 });

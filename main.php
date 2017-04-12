@@ -123,12 +123,10 @@ class nensa_admin {
 		wp_enqueue_script('jquery-ui-dialog');  // For admin panel popup alerts
 
 		wp_enqueue_script( 'ajax-script', plugins_url( '/js/nensa_ajax.js', __FILE__ ), array('jquery') );
-
-		// in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
-		wp_localize_script( 'ajax-script', 'ajax_object',	array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'season' => 2014 ) );
-		
 		wp_enqueue_script( 'nensa_admin', plugins_url( '/js/admin_page.js', __FILE__ ), array('jquery') );  // Apply admin page scripts
-		wp_localize_script( 'nensa_admin', 'wp_csv_to_db_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
+
+		wp_localize_script( 'nensa_admin', 'nensa_admin_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
+		//wp_localize_script( 'nensa_admin', 'wp_csv_to_db_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
 	}
 	
 	public function nensa_admin_admin_styles() {
@@ -152,7 +150,12 @@ class nensa_admin {
 		$error_message = '';
 		$success_message = '';
 		$message_info_style = '';
-		
+
+		$member_skier_date = get_option('member_skier_date');
+	  if ($member_skier_date == false) {
+	    add_option('member_skier_date','Never Processed');
+	    $member_skier_date = 'Never Processed';
+	  }
 		
 		// If there is a message - info-style
 		if(!empty($message_info_style)) {
@@ -193,7 +196,18 @@ class nensa_admin {
           <li><a href="#tabs-5"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
         </ul>
           <div id="tabs-1">
-          	<?php	 fetch_member_data(); //search_neon_for_racer();?>
+          	<h1>NENSA Member Update From NEON</h1>
+					  </br>
+					  <form action=# method="POST" >
+					    <input type="hidden" name="searchCriteria" value=true/>
+					    <input id="reload_all_from_neon" type="checkbox" name="reload" value=true> Reload All Members</br></br>
+					    <input id="neon_member_load" type="input" type="button" class="button-primary" value="<?php _e('Load Member Tables', 'nensa_admin') ?>" /></br>
+					  </form>
+					  </br>
+					  <p id='date_of_last_load'>Date last loaded: <?php echo $member_skier_date ?></p>
+					  <p id='skier_load_counts'></p>
+					  <p id='season_load_counts'></p>
+					  <hr>
           </div> <!-- End tab 1 -->
           <div id="tabs-2">
           	</br><strong>Load 2016/2017 Event Data</strong></br>
@@ -250,21 +264,6 @@ class nensa_admin {
       </div> <!-- End #tabs -->
     </div> <!-- End page wrap -->
     
-    
-    <!-- Delete table warning - jquery dialog -->
-    <div id="dialog-confirm" title="<?php _e('Delete database table?','nensa_admin'); ?>">
-    	<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><?php _e('This table will be permanently deleted and cannot be recovered. Proceed?','nensa_admin'); ?></p>
-    </div>
-    
-    <!-- Alert invalid .csv file - jquery dialog -->
-    <div id="dialog_csv_file" title="<?php _e('Invalid File Extension','nensa_admin'); ?>" style="display:none;">
-    	<p><?php _e('This is not a valid .csv file extension.','nensa_admin'); ?></p>
-    </div>
-    
-    <!-- Alert select db table - jquery dialog -->
-    <div id="dialog_select_db" title="<?php _e('Database Table not Selected','nensa_admin'); ?>" style="display:none;">
-    	<p><?php _e('First, please select a database table from the dropdown list.','nensa_admin'); ?></p>
-    </div>
     <?php
 	}
 	

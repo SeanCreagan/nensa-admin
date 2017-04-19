@@ -105,7 +105,7 @@ function nensa_display_event_results_table( $datatables_id ) {
 	}
 
 	if ( !isset( $results_db ) ) { echo "DB not available"; }
-		$quer2="SELECT DISTINCT season FROM race_event order by season"; 
+		$quer2="SELECT DISTINCT season FROM race_event where season > 2016 order by season desc"; 
 	if (array_key_exists("season",$_GET)) {
 		$season = $_GET['season'];
 	} 

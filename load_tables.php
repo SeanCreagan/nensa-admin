@@ -63,7 +63,7 @@ function nensa_display_jn_rankings_table( $datatables_id ) {
 	if(isset($_POST['gender'])){
 		$season = $_POST['season'];
 		$gender = $_POST['gender'];
-		$shortcode = '[wpdatatable id='.$datatables_id.' VAR1="'.$gender.'" table_view=regular]';
+		$shortcode = '[wpdatatable id='.$datatables_id.' VAR1="'.$season.'" VAR2="'.$gender.'" table_view=regular]';
     echo "</br><hr>";
     echo do_shortcode($shortcode); 
 	}

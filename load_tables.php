@@ -122,7 +122,7 @@ function nensa_display_event_results_table( $datatables_id ) {
 	} 
 
 	echo "<form method=post name=f1>";
-	echo "<select name='season' onchange=\"reload(this.form)\"><option value=''>Select one</option>";
+	echo "<select name='season' onchange=\"reload(this.form)\"><option value=''>Select Season</option>";
 	foreach ($results_db->query($quer2) as $noticia2) {
 		if($noticia2['season']==@$season) {
 			echo "<option selected value='$noticia2[season]'>$noticia2[season]</option>"."<BR>";}
@@ -132,7 +132,7 @@ function nensa_display_event_results_table( $datatables_id ) {
 	}
 	echo "</select>";
 	echo "</br></br>";
-	echo "<select style='width:400px' name='event_id' onchange=\"reload3(this.form)\"><option value=''>Select one</option>";
+	echo "<select style='width:400px' name='event_id' onchange=\"reload3(this.form)\"><option value=''>Select Event</option>";
 	foreach ($results_db->query($quer) as $noticia) {
 		if($noticia['event_id']==@$event_id) {
 			echo  "<option selected value='$noticia[event_id]'>$noticia[event_name]</option>";
@@ -142,7 +142,7 @@ function nensa_display_event_results_table( $datatables_id ) {
 	}
 	echo "</select>";
 	echo "</br></br>";
-	echo "<select style='width:400px' name='event_name'><option value=''>Select one</option>";
+	echo "<select style='width:400px' name='event_name'><option value=''>Select Race</option>";
 	foreach ($results_db->query($quer3) as $noticia) {
 	  if(isset($_POST['event_name'])){
 	    $event_name = $_POST['event_name'];

@@ -106,19 +106,19 @@ function nensa_display_event_results_table( $datatables_id ) {
 	}
 
 	if ( !isset( $results_db ) ) { echo "DB not available"; }
-		$quer2="SELECT DISTINCT season FROM race_event where season > 2016 order by season desc"; 
+		$quer2="SELECT DISTINCT season FROM RACE_EVENT where season > 2016 order by season desc"; 
 	if (array_key_exists("season",$_GET)) {
 		$season = $_GET['season'];
 	} 
 	if(isset($season) and strlen($season) > 0) {
-		$quer="SELECT DISTINCT event_name, event_id FROM race_event WHERE parent_event_id IS NULL AND season=$season order by event_name"; 
+		$quer="SELECT DISTINCT event_name, event_id FROM RACE_EVENT WHERE parent_event_id IS NULL AND season=$season order by event_name"; 
 	}
 
 	if (array_key_exists("event_id",$_GET)) {
 		$event_id = $_GET['event_id'];
 	} 
 	if(isset($event_id) and strlen($event_id) > 0) {
-		$quer3="SELECT DISTINCT event_name FROM race_event where parent_event_id=$event_id order by event_name"; 
+		$quer3="SELECT DISTINCT event_name FROM RACE_EVENT where parent_event_id=$event_id order by event_name"; 
 	} 
 
 	echo "<form method=post name=f1>";
